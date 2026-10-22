@@ -142,6 +142,7 @@ class RemoteBridgeTransferService : Service() {
             if (cancelRequested) throw CancellationException("Transfer cancelled before start")
             val client = RemoteBridgeClient(config.endpoint, config.token)
             activeClient = client
+            if (cancelRequested) throw CancellationException("Transfer cancelled before network request")
             RemoteBridgeTransferStore.save(this, state)
             showNotification(state)
 
