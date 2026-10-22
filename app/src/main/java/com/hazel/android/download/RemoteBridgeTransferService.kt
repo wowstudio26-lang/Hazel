@@ -92,7 +92,7 @@ class RemoteBridgeTransferService : Service() {
             )
             RemoteBridgeTransferStore.save(this, failed)
             showNotification(failed)
-            stopForegroundAndSelf(startId)
+            stopForegroundAndSelf()
             return
         }
 
