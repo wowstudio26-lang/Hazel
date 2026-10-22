@@ -877,4 +877,5 @@
     <string name="remote_bridge_transfer_failed">Не удалось передать удалённый файл.</string>
     <string name="remote_bridge_notification_channel">Передача удалённых файлов</string>
     <string name="remote_bridge_notification_description">Отображение прогресса и отмена загрузок удалённых файлов.</string>
+    <string name="remote_bridge_retry_transfer">Повторить передачу</string>
 </resources>
