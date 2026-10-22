@@ -913,4 +913,5 @@
     <string name="remote_bridge_transfer_failed">Remote file transfer failed.</string>
     <string name="remote_bridge_notification_channel">Remote file transfer</string>
     <string name="remote_bridge_notification_description">Progress and cancellation controls for remote file downloads.</string>
+    <string name="remote_bridge_retry_transfer">Retry transfer</string>
 </resources>
