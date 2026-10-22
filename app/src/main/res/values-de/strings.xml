@@ -858,4 +858,5 @@
     <string name="remote_bridge_transfer_failed">Die Übertragung der Remote-Datei ist fehlgeschlagen.</string>
     <string name="remote_bridge_notification_channel">Remote-Dateiübertragung</string>
     <string name="remote_bridge_notification_description">Fortschritt und Abbruchoptionen für Remote-Dateidownloads.</string>
+    <string name="remote_bridge_retry_transfer">Übertragung erneut versuchen</string>
 </resources>
