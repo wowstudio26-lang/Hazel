@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.hazel.android.download.RemoteBridgeClient
+import com.hazel.android.download.RemoteBridgeDownloads
 import com.hazel.android.download.RemoteBridgeSecrets
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -126,20 +127,21 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                         scope.launch {
                             busy = true
                             try {
-                                val folder = File(context.getExternalFilesDir(null), "Download/Hazel")
                                 val safeName = relative.substringAfterLast('/').ifBlank { "remote-download.bin" }
-                                val destination = File(folder, safeName)
-                                client().downloadFile(jobId ?: error("No job"), relative, destination)
-                                savedPath = destination.absolutePath
-                                status = "File downloaded successfully."
+                                val temporary = File(context.cacheDir, "remote-bridge-${System.currentTimeMillis()}.part")
+                                client().downloadFile(jobId ?: error("No job"), relative, temporary)
+                                val published = RemoteBridgeDownloads.publish(context, temporary, safeName)
+                                temporary.delete()
+                                savedPath = published.toString()
+                                status = "File saved to public Downloads/Hazel."
                             } catch (e: Exception) { status = e.message ?: "File download failed" }
                             finally { busy = false }
                         }
                     }) { Text("Download: ${relative.substringAfterLast('/')}") }
                 }
-                savedPath?.let { Text("Saved to app-specific storage: $it", style = MaterialTheme.typography.bodySmall) }
+                savedPath?.let { Text("Saved file URI: $it", style = MaterialTheme.typography.bodySmall) }
             }
         }
-        Text("Note: downloaded files currently go to Hazel's app-specific storage, not the public Downloads folder. Public-folder integration and full queue persistence remain follow-up work.")
+        Text("Files are published to the public Downloads/Hazel folder. Keep the bridge URL private and use HTTPS for remote connections.")
     }
 }
