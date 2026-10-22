@@ -870,4 +870,11 @@
     <string name="remote_bridge_job_submitted">Задача отправлена %1$s: %2$s</string>
     <string name="remote_bridge_cancel_requested">Запрошена отмена.</string>
     <string name="remote_bridge_file_transfer_cancelling">Отмена передачи файла…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">Передача файла отменена.</string>
+    <string name="remote_bridge_transfer_interrupted">Передача прервана. Нажмите «Скачать», чтобы повторить попытку.</string>
+    <string name="remote_bridge_transfer_failed">Не удалось передать удалённый файл.</string>
+    <string name="remote_bridge_notification_channel">Передача удалённых файлов</string>
+    <string name="remote_bridge_notification_description">Отображение прогресса и отмена загрузок удалённых файлов.</string>
 </resources>
