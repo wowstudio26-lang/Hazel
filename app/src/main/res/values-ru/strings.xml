@@ -865,4 +865,9 @@
     <string name="remote_bridge_initial_status">Настройте мост, затем отправьте magnet-ссылку.</string>
     <string name="remote_bridge_settings_saved">Настройки моста зашифрованы и сохранены на этом устройстве.</string>
     <string name="remote_bridge_connection_success">Подключено: %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">Задача отправлена %1$s: %2$s</string>
+    <string name="remote_bridge_cancel_requested">Запрошена отмена.</string>
+    <string name="remote_bridge_file_transfer_cancelling">Отмена передачи файла…</string>
 </resources>
