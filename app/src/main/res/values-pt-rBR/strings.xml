@@ -861,4 +861,11 @@
     <string name="remote_bridge_job_submitted">Tarefa enviada %1$s: %2$s</string>
     <string name="remote_bridge_cancel_requested">Cancelamento solicitado.</string>
     <string name="remote_bridge_file_transfer_cancelling">Cancelando transferência do arquivo…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">Transferência do arquivo cancelada.</string>
+    <string name="remote_bridge_transfer_interrupted">Transferência interrompida. Selecione Baixar para tentar novamente.</string>
+    <string name="remote_bridge_transfer_failed">Falha na transferência do arquivo remoto.</string>
+    <string name="remote_bridge_notification_channel">Transferência de arquivo remoto</string>
+    <string name="remote_bridge_notification_description">Progresso e controles de cancelamento para downloads remotos.</string>
 </resources>
