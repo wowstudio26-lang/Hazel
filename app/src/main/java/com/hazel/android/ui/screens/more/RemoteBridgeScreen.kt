@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.hazel.android.download.RemoteBridgeClient
 import com.hazel.android.download.RemoteBridgeDownloads
+import com.hazel.android.download.RemoteBridgeJobStore
 import com.hazel.android.download.RemoteBridgeSecrets
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,13 +40,16 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
     val initial = remember(context) { RemoteBridgeSecrets.load(context) }
     var endpoint by remember { mutableStateOf(initial?.endpoint.orEmpty()) }
     var token by remember { mutableStateOf(initial?.token.orEmpty()) }
-    var magnet by remember { mutableStateOf("") }
-    var jobId by remember { mutableStateOf<String?>(null) }
+    val savedJob = remember(context) { RemoteBridgeJobStore.load(context) }
+    var magnet by remember { mutableStateOf(savedJob?.magnetUri.orEmpty()) }
+    var jobId by remember { mutableStateOf<String?>(savedJob?.id) }
     var status by remember { mutableStateOf("Configure your bridge, then submit a magnet link.") }
     var files by remember { mutableStateOf<List<String>>(emptyList()) }
     var busy by remember { mutableStateOf(false) }
     var savedPath by remember { mutableStateOf<String?>(null) }
     var transferProgress by remember { mutableStateOf<String?>(null) }
+    var isDownloadingFile by remember { mutableStateOf(false) }
+    var activeTransferClient by remember { mutableStateOf<RemoteBridgeClient?>(null) }
 
     fun client(): RemoteBridgeClient {
         require(endpoint.isNotBlank()) { "Enter the bridge HTTPS URL" }
@@ -56,16 +60,21 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
     LaunchedEffect(jobId, endpoint, token) {
         val id = jobId ?: return@LaunchedEffect
         if (endpoint.isBlank() || token.length < 32) return@LaunchedEffect
+        var retryDelay = 5000L
         while (true) {
             try {
                 val job = client().getJob(id)
                 status = "${job.status}: ${job.message}".trim()
                 files = job.files
+                retryDelay = 5000L
                 if (job.status.lowercase() in setOf("complete", "completed", "failed", "cancelled", "canceled", "error")) break
             } catch (e: Exception) {
-                status = e.message ?: "Could not refresh remote job"
+                val message = e.message ?: "Could not refresh remote job"
+                status = message
+                if (listOf("(401)", "(403)", "(404)").any(message::contains)) break
+                retryDelay = (retryDelay * 2).coerceAtMost(30000L)
             }
-            delay(5000)
+            delay(retryDelay)
         }
     }
 
@@ -101,6 +110,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 try {
                     val job = client().createMagnetJob(magnet.trim())
                     jobId = job.id
+                    RemoteBridgeJobStore.save(context, job.id, magnet.trim())
                     status = "Submitted job ${job.id}: ${job.status}"
                     files = job.files
                     savedPath = null
@@ -127,11 +137,15 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                     OutlinedButton(enabled = !busy, onClick = {
                         scope.launch {
                             busy = true
+                            isDownloadingFile = true
+                            var temporary: File? = null
                             try {
                                 val safeName = relative.substringAfterLast('/').ifBlank { "remote-download.bin" }
-                                val temporary = File(context.cacheDir, "remote-bridge-${System.currentTimeMillis()}.part")
-                                transferProgress = "Preparing download…"
-                                client().downloadFile(jobId ?: error("No job"), relative, temporary) { downloaded, total ->
+                                temporary = File(context.cacheDir, "remote-bridge-${System.currentTimeMillis()}.part")
+                                val transferClient = client()
+                                activeTransferClient = transferClient
+                                transferProgress = "Starting transfer…"
+                                transferClient.downloadFile(jobId ?: error("No job"), relative, temporary) { downloaded, total ->
                                     scope.launch {
                                         transferProgress = if (total > 0L) {
                                             "Downloaded ${downloaded / (1024 * 1024)} / ${total / (1024 * 1024)} MiB"
@@ -141,15 +155,25 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                     }
                                 }
                                 val published = RemoteBridgeDownloads.publish(context, temporary, safeName)
-                                temporary.delete()
                                 savedPath = published.toString()
                                 status = "File saved to public Downloads/Hazel."
-                            } catch (e: Exception) { status = e.message ?: "File download failed" }
-                            finally { busy = false }
+                            } catch (e: Exception) {
+                                temporary?.delete()
+                                status = e.message ?: "File download failed"
+                            } finally {
+                                temporary?.delete()
+                                activeTransferClient = null
+                                isDownloadingFile = false
+                                busy = false
+                            }
                         }
                     }) { Text("Download: ${relative.substringAfterLast('/')}") }
                 }
                 transferProgress?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                OutlinedButton(enabled = isDownloadingFile, onClick = {
+                    activeTransferClient?.cancelActiveFileDownload()
+                    status = "Cancelling file transfer…"
+                }) { Text("Cancel file transfer") }
                 savedPath?.let { Text("Saved file URI: $it", style = MaterialTheme.typography.bodySmall) }
             }
         }
