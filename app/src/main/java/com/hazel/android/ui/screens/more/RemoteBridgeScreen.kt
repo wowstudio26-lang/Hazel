@@ -96,13 +96,25 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                     } catch (e: Exception) { status = e.message ?: "Could not save settings" }
                 }
             }) { Text("Save settings") }
-            OutlinedButton(onClick = {
-                RemoteBridgeSecrets.clear(context)
-                token = ""
-                endpoint = ""
-                status = "Saved bridge settings cleared."
-            }) { Text("Clear") }
+            OutlinedButton(enabled = !busy, onClick = {
+                scope.launch {
+                    busy = true
+                    try {
+                        status = "Connected: " + client().checkConnection()
+                    } catch (e: Exception) {
+                        status = e.message ?: "Bridge connection failed"
+                    } finally {
+                        busy = false
+                    }
+                }
+            }) { Text("Test connection") }
         }
+        OutlinedButton(onClick = {
+            RemoteBridgeSecrets.clear(context)
+            token = ""
+            endpoint = ""
+            status = "Saved bridge settings cleared."
+        }) { Text("Clear bridge settings") }
         OutlinedTextField(magnet, { magnet = it }, label = { Text("BitTorrent magnet link") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
         Button(enabled = !busy, onClick = {
             scope.launch {
@@ -124,14 +136,22 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 Text(status)
                 jobId?.let { id ->
                     Text("Job ID: $id", style = MaterialTheme.typography.bodySmall)
-                    OutlinedButton(enabled = !busy, onClick = {
-                        scope.launch {
-                            busy = true
-                            try { client().cancelJob(id); status = "Cancellation requested." }
-                            catch (e: Exception) { status = e.message ?: "Cancel failed" }
-                            finally { busy = false }
-                        }
-                    }) { Text("Cancel job") }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(enabled = !busy, onClick = {
+                            scope.launch {
+                                busy = true
+                                try { client().cancelJob(id); status = "Cancellation requested." }
+                                catch (e: Exception) { status = e.message ?: "Cancel failed" }
+                                finally { busy = false }
+                            }
+                        }) { Text("Cancel job") }
+                        OutlinedButton(enabled = !busy, onClick = {
+                            RemoteBridgeJobStore.clear(context)
+                            jobId = null
+                            files = emptyList()
+                            status = "Local job history cleared. The remote task, if active, was not cancelled."
+                        }) { Text("Forget job") }
+                    }
                 }
                 files.forEach { relative ->
                     OutlinedButton(enabled = !busy, onClick = {
