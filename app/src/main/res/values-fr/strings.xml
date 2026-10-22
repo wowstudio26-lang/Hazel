@@ -868,4 +868,5 @@
     <string name="remote_bridge_transfer_failed">Échec du transfert du fichier distant.</string>
     <string name="remote_bridge_notification_channel">Transfert de fichier distant</string>
     <string name="remote_bridge_notification_description">Progression et commandes d’annulation des téléchargements distants.</string>
+    <string name="remote_bridge_retry_transfer">Réessayer le transfert</string>
 </resources>
