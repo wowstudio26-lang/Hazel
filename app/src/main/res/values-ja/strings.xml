@@ -848,4 +848,5 @@
     <string name="remote_bridge_transfer_failed">リモートファイルの転送に失敗しました。</string>
     <string name="remote_bridge_notification_channel">リモートファイル転送</string>
     <string name="remote_bridge_notification_description">リモートファイルのダウンロード進捗とキャンセル操作。</string>
+    <string name="remote_bridge_retry_transfer">転送を再試行</string>
 </resources>
