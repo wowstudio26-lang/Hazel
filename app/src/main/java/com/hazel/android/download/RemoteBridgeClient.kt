@@ -4,6 +4,7 @@ import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -30,6 +31,13 @@ class RemoteBridgeClient(
         .build()
 ) {
     private val baseUrl: String = baseUrl.trim().trimEnd('/')
+
+    @Volatile private var activeDownloadCall: Call? = null
+
+    /** Cancels the currently-running file transfer, if any. */
+    fun cancelActiveFileDownload() {
+        activeDownloadCall?.cancel()
+    }
 
     init {
         val parsed = Uri.parse(this.baseUrl)
@@ -102,23 +110,31 @@ class RemoteBridgeClient(
                 .get().build()
             destination.parentFile?.mkdirs()
             val part = File(destination.parentFile ?: File("."), destination.name + ".part")
+            val call = http.newCall(request)
+            activeDownloadCall = call
             try {
-                http.newCall(request).execute().use { response ->
+                call.execute().use { response ->
                     if (!response.isSuccessful) {
                         throw IOException("Bridge file request failed (${response.code}): ${responseMessage(response.body?.string())}")
                     }
                     val body = response.body ?: throw IOException("Bridge returned an empty response")
                     val total = body.contentLength()
                     var downloaded = 0L
+                    var lastReported = 0L
                     body.byteStream().buffered().use { input ->
                         part.outputStream().buffered().use { output ->
                             val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                             while (true) {
+                                if (call.isCanceled()) throw IOException("File transfer cancelled")
                                 val count = input.read(buffer)
                                 if (count < 0) break
                                 output.write(buffer, 0, count)
                                 downloaded += count
-                                onProgress(downloaded, total)
+                                if (downloaded - lastReported >= 512 * 1024 ||
+                                    (total > 0 && downloaded >= total)) {
+                                    lastReported = downloaded
+                                    onProgress(downloaded, total)
+                                }
                             }
                         }
                     }
@@ -133,6 +149,8 @@ class RemoteBridgeClient(
             } catch (failure: Exception) {
                 part.delete()
                 throw failure
+            } finally {
+                if (activeDownloadCall === call) activeDownloadCall = null
             }
         }
 
