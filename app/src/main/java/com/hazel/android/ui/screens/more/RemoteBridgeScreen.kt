@@ -38,7 +38,6 @@ import com.hazel.android.download.RemoteBridgeSecrets
 import com.hazel.android.ui.components.EqualWidthActions
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 
 @Composable
 fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
@@ -170,15 +169,18 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                         scope.launch {
                             busy = true
                             isDownloadingFile = true
-                            var temporary: File? = null
                             try {
                                 val safeName = relative.substringAfterLast('/').ifBlank { "remote-download.bin" }
-                                val tempFile = File(context.cacheDir, "remote-bridge-${System.currentTimeMillis()}.part")
-                                temporary = tempFile
                                 val transferClient = client()
                                 activeTransferClient = transferClient
                                 transferProgress = context.getString(R.string.remote_bridge_starting_transfer)
-                                transferClient.downloadFile(jobId ?: error("No job"), relative, tempFile) { downloaded, total ->
+                                val published = RemoteBridgeDownloads.downloadAndPublish(
+                                    context = context,
+                                    client = transferClient,
+                                    jobId = jobId ?: error("No job"),
+                                    relativePath = relative,
+                                    displayName = safeName
+                                ) { downloaded, total ->
                                     scope.launch {
                                         transferProgress = if (total > 0L) {
                                             context.getString(R.string.remote_bridge_progress_known,
@@ -189,14 +191,11 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                         }
                                     }
                                 }
-                                val published = RemoteBridgeDownloads.publish(context, tempFile, safeName)
                                 savedPath = published.toString()
                                 status = context.getString(R.string.remote_bridge_transfer_complete)
                             } catch (e: Exception) {
-                                temporary?.delete()
                                 status = e.message ?: "File download failed"
                             } finally {
-                                temporary?.delete()
                                 activeTransferClient = null
                                 isDownloadingFile = false
                                 busy = false
