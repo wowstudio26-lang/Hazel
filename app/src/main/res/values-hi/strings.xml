@@ -846,4 +846,9 @@
     <string name="remote_bridge_initial_status">ब्रिज सेट करें, फिर मैग्नेट लिंक भेजें।</string>
     <string name="remote_bridge_settings_saved">ब्रिज सेटिंग इस डिवाइस पर सुरक्षित रूप से सेव हुई।</string>
     <string name="remote_bridge_connection_success">कनेक्ट हुआ: %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">जॉब भेजा गया %1$s: %2$s</string>
+    <string name="remote_bridge_cancel_requested">रद्द करने का अनुरोध भेजा गया।</string>
+    <string name="remote_bridge_file_transfer_cancelling">फ़ाइल ट्रांसफ़र रद्द हो रहा है…</string>
 </resources>
