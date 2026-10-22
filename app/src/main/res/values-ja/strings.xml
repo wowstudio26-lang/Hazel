@@ -841,4 +841,11 @@
     <string name="remote_bridge_job_submitted">ジョブを送信しました %1$s：%2$s</string>
     <string name="remote_bridge_cancel_requested">キャンセルをリクエストしました。</string>
     <string name="remote_bridge_file_transfer_cancelling">ファイル転送をキャンセル中…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">ファイル転送をキャンセルしました。</string>
+    <string name="remote_bridge_transfer_interrupted">転送が中断されました。再試行するには「ダウンロード」を選択してください。</string>
+    <string name="remote_bridge_transfer_failed">リモートファイルの転送に失敗しました。</string>
+    <string name="remote_bridge_notification_channel">リモートファイル転送</string>
+    <string name="remote_bridge_notification_description">リモートファイルのダウンロード進捗とキャンセル操作。</string>
 </resources>
