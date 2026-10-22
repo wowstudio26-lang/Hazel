@@ -29,7 +29,7 @@ object RemoteBridgeDownloads {
             val temporary = File(folder, ".${destination.name}.${System.nanoTime()}.part")
             try {
                 source.inputStream().buffered().use { input ->
-                    temporary.outputStream().buffered().use(input::copyTo)
+                    temporary.outputStream().buffered().use { output -> input.copyTo(output) }
                 }
                 if (destination.exists()) destination = File(folder, uniqueFileName(folder, safeName))
                 if (!temporary.renameTo(destination)) throw IOException("Could not finalize file in Downloads/Hazel")
