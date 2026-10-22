@@ -848,4 +848,5 @@
     <string name="remote_bridge_transfer_failed">Transfer file jarak jauh gagal.</string>
     <string name="remote_bridge_notification_channel">Transfer file jarak jauh</string>
     <string name="remote_bridge_notification_description">Progres dan kontrol pembatalan untuk unduhan file jarak jauh.</string>
+    <string name="remote_bridge_retry_transfer">Coba transfer lagi</string>
 </resources>
