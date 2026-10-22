@@ -28,7 +28,7 @@ Use the companion [PC-Free bridge pull request](https://github.com/wowstudio26-l
 
 - PC-Free persists job metadata at `/state/jobs.json` and keeps completed payloads under `/downloads`; the Compose file mounts both as named volumes.
 - A completed job and its available files survive a container restart.
-- An active job interrupted by a bridge restart is restored as failed with a message asking the user to submit the magnet again. The peer transfer is not automatically resumed.
+- Queued/interrupted jobs are rescheduled using their original job folder. aria2 can resume partial files when its control files are intact; when those files are missing or damaged, it may need to restart the transfer.
 - Hazel stores the last job ID and magnet locally so it can query the bridge again when reopened. If the bridge has lost or no longer recognises the job, the screen reports the API error.
 - Downloads run from the Remote Bridge screen's coroutine scope. They are not yet part of Hazel's canonical persistent download queue and do not have a dedicated background worker/notification. Keep Hazel in a stable foreground session during large file transfers until background transfer support is added.
 
