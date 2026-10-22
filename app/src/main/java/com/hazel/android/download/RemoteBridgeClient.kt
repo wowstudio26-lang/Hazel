@@ -57,6 +57,21 @@ class RemoteBridgeClient(
         val files: List<String>
     )
 
+    suspend fun checkConnection(): String = withContext(Dispatchers.IO) {
+        val request = Request.Builder()
+            .url("$baseUrl/health")
+            .header("Accept", "application/json")
+            .get()
+            .build()
+        http.newCall(request).execute().use { response ->
+            val raw = response.body?.string().orEmpty()
+            if (!response.isSuccessful) throw IOException("Bridge health check failed (${response.code})")
+            val json = JSONObject(raw)
+            if (json.optString("status") != "ok") throw IOException("Bridge health check returned an unexpected status")
+            json.optString("service", "PC-Free bridge")
+        }
+    }
+
     suspend fun createMagnetJob(magnetUri: String): Job = withContext(Dispatchers.IO) {
         require(magnetUri.startsWith("magnet:?") &&
             (magnetUri.contains("xt=urn:btih:") || magnetUri.contains("xt=urn:btmh:"))) {
