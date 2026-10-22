@@ -816,4 +816,34 @@
     <string name="proxy_remove">Proxy entfernen</string>
     <string name="proxy_host_invalid">Hostname oder IP-Adresse eingeben</string>
     <string name="proxy_port_invalid">Port von 1 bis 65535 eingeben</string>
+
+    <!-- Remote Bridge -->
+    <string name="more_remote_bridge_title">Remote Bridge</string>
+    <string name="more_remote_bridge_subtitle">PC-Free-Downloads aus der Ferne einrichten</string>
+    <string name="remote_bridge_title">Remote Bridge</string>
+    <string name="remote_bridge_intro">Verwende PC-Free in einem Netzwerk, in dem Torrent-Downloads erlaubt sind. Remote-Bridge-URLs müssen HTTPS verwenden.</string>
+    <string name="remote_bridge_url">Bridge-URL (HTTPS)</string>
+    <string name="remote_bridge_token">Bearer-Token</string>
+    <string name="remote_bridge_save_settings">Einstellungen speichern</string>
+    <string name="remote_bridge_test_connection">Verbindung testen</string>
+    <string name="remote_bridge_clear_settings">Bridge-Einstellungen löschen</string>
+    <string name="remote_bridge_magnet_hint">BitTorrent-Magnet-Link</string>
+    <string name="remote_bridge_start_download">Remote-Download starten</string>
+    <string name="remote_bridge_submitting">Wird übermittelt…</string>
+    <string name="remote_bridge_job_status">Auftragsstatus</string>
+    <string name="remote_bridge_job_id">Auftrags-ID: %1$s</string>
+    <string name="remote_bridge_cancel_job">Auftrag abbrechen</string>
+    <string name="remote_bridge_forget_job">Auftrag vergessen</string>
+    <string name="remote_bridge_history_cleared">Lokaler Auftragsverlauf gelöscht. Ein aktiver Remote-Auftrag wurde nicht abgebrochen.</string>
+    <string name="remote_bridge_download_file">Herunterladen: %1$s</string>
+    <string name="remote_bridge_starting_transfer">Übertragung wird gestartet…</string>
+    <string name="remote_bridge_progress_known">Heruntergeladen: %1$d / %2$d MiB</string>
+    <string name="remote_bridge_progress_unknown">Heruntergeladen: %1$d MiB</string>
+    <string name="remote_bridge_cancel_file_transfer">Dateiübertragung abbrechen</string>
+    <string name="remote_bridge_saved_file_uri">Gespeicherte Datei-URI: %1$s</string>
+    <string name="remote_bridge_transfer_complete">Datei wurde im öffentlichen Ordner Downloads/Hazel gespeichert.</string>
+    <string name="remote_bridge_footer">Dateien werden im öffentlichen Ordner Downloads/Hazel gespeichert. Halte die Bridge-URL geheim und verwende für Remote-Verbindungen HTTPS.</string>
+    <string name="remote_bridge_initial_status">Richte die Bridge ein und übermittle dann einen Magnet-Link.</string>
+    <string name="remote_bridge_settings_saved">Bridge-Einstellungen wurden auf diesem Gerät verschlüsselt gespeichert.</string>
+    <string name="remote_bridge_connection_success">Verbunden: %1$s</string>
 </resources>
