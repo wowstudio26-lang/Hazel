@@ -141,11 +141,12 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                             var temporary: File? = null
                             try {
                                 val safeName = relative.substringAfterLast('/').ifBlank { "remote-download.bin" }
-                                temporary = File(context.cacheDir, "remote-bridge-${System.currentTimeMillis()}.part")
+                                val tempFile = File(context.cacheDir, "remote-bridge-${System.currentTimeMillis()}.part")
+                                temporary = tempFile
                                 val transferClient = client()
                                 activeTransferClient = transferClient
                                 transferProgress = "Starting transfer…"
-                                transferClient.downloadFile(jobId ?: error("No job"), relative, temporary) { downloaded, total ->
+                                transferClient.downloadFile(jobId ?: error("No job"), relative, tempFile) { downloaded, total ->
                                     scope.launch {
                                         transferProgress = if (total > 0L) {
                                             "Downloaded ${downloaded / (1024 * 1024)} / ${total / (1024 * 1024)} MiB"
@@ -154,7 +155,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                         }
                                     }
                                 }
-                                val published = RemoteBridgeDownloads.publish(context, temporary, safeName)
+                                val published = RemoteBridgeDownloads.publish(context, tempFile, safeName)
                                 savedPath = published.toString()
                                 status = "File saved to public Downloads/Hazel."
                             } catch (e: Exception) {
