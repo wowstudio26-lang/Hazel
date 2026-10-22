@@ -27,6 +27,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.hazel.android.R
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.hazel.android.download.RemoteBridgeClient
@@ -48,7 +50,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
     val savedJob = remember(context) { RemoteBridgeJobStore.load(context) }
     var magnet by remember { mutableStateOf(savedJob?.magnetUri.orEmpty()) }
     var jobId by remember { mutableStateOf<String?>(savedJob?.id) }
-    var status by remember { mutableStateOf("Configure your bridge, then submit a magnet link.") }
+    var status by remember { mutableStateOf(context.getString(R.string.remote_bridge_initial_status)) }
     var files by remember { mutableStateOf<List<String>>(emptyList()) }
     var busy by remember { mutableStateOf(false) }
     var savedPath by remember { mutableStateOf<String?>(null) }
@@ -89,20 +91,20 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
     ) {
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.settings_back))
             }
-            Text("Remote Bridge", style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.remote_bridge_title), style = MaterialTheme.typography.headlineMedium)
         }
-        Text("Use a PC-Free bridge on a network where torrent traffic is permitted. Remote endpoints must use HTTPS.")
-        OutlinedTextField(endpoint, { endpoint = it }, label = { Text("Bridge URL (HTTPS)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(token, { token = it }, label = { Text("Bearer token") }, visualTransformation = PasswordVisualTransformation(), singleLine = true, modifier = Modifier.fillMaxWidth())
+        Text(stringResource(R.string.remote_bridge_intro))
+        OutlinedTextField(endpoint, { endpoint = it }, label = { Text(stringResource(R.string.remote_bridge_url)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(token, { token = it }, label = { Text(stringResource(R.string.remote_bridge_token)) }, visualTransformation = PasswordVisualTransformation(), singleLine = true, modifier = Modifier.fillMaxWidth())
         EqualWidthActions(modifier = Modifier.fillMaxWidth(), spacing = 8.dp) {
             Button(onClick = {
                 scope.launch {
                     try {
                         client()
                         RemoteBridgeSecrets.save(context, endpoint, token)
-                        status = "Bridge settings saved securely on this device."
+                        status = context.getString(R.string.remote_bridge_settings_saved)
                     } catch (e: Exception) { status = e.message ?: "Could not save settings" }
                 }
             }) { Text("Save settings") }
@@ -110,7 +112,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 scope.launch {
                     busy = true
                     try {
-                        status = "Connected: " + client().checkConnection()
+                        status = context.getString(R.string.remote_bridge_connection_success, client().checkConnection())
                     } catch (e: Exception) {
                         status = e.message ?: "Bridge connection failed"
                     } finally {
@@ -123,9 +125,9 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
             RemoteBridgeSecrets.clear(context)
             token = ""
             endpoint = ""
-            status = "Saved bridge settings cleared."
+            status = context.getString(R.string.remote_bridge_initial_status)
         }) { Text("Clear bridge settings") }
-        OutlinedTextField(magnet, { magnet = it }, label = { Text("BitTorrent magnet link") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
+        OutlinedTextField(magnet, { magnet = it }, label = { Text(stringResource(R.string.remote_bridge_magnet_hint)) }, modifier = Modifier.fillMaxWidth(), minLines = 2)
         Button(enabled = !busy, onClick = {
             scope.launch {
                 busy = true
@@ -139,28 +141,28 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 } catch (e: Exception) { status = e.message ?: "Could not submit job" }
                 finally { busy = false }
             }
-        }) { Text(if (busy) "Submitting…" else "Start remote download") }
+        }) { Text(if (busy) stringResource(R.string.remote_bridge_submitting) else stringResource(R.string.remote_bridge_start_download)) }
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Job status", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.remote_bridge_job_status), style = MaterialTheme.typography.titleMedium)
                 Text(status)
                 jobId?.let { id ->
-                    Text("Job ID: $id", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.remote_bridge_job_id, id), style = MaterialTheme.typography.bodySmall)
                     EqualWidthActions(modifier = Modifier.fillMaxWidth(), spacing = 8.dp) {
                         OutlinedButton(enabled = !busy, onClick = {
                             scope.launch {
                                 busy = true
-                                try { client().cancelJob(id); status = "Cancellation requested." }
+                                try { client().cancelJob(id); status = context.getString(R.string.remote_bridge_cancel_job) }
                                 catch (e: Exception) { status = e.message ?: "Cancel failed" }
                                 finally { busy = false }
                             }
-                        }) { Text("Cancel job") }
+                        }) { Text(stringResource(R.string.remote_bridge_cancel_job)) }
                         OutlinedButton(enabled = !busy, onClick = {
                             RemoteBridgeJobStore.clear(context)
                             jobId = null
                             files = emptyList()
-                            status = "Local job history cleared. The remote task, if active, was not cancelled."
-                        }) { Text("Forget job") }
+                            status = context.getString(R.string.remote_bridge_history_cleared)
+                        }) { Text(stringResource(R.string.remote_bridge_forget_job)) }
                     }
                 }
                 files.forEach { relative ->
@@ -175,7 +177,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                 temporary = tempFile
                                 val transferClient = client()
                                 activeTransferClient = transferClient
-                                transferProgress = "Starting transfer…"
+                                transferProgress = context.getString(R.string.remote_bridge_starting_transfer)
                                 transferClient.downloadFile(jobId ?: error("No job"), relative, tempFile) { downloaded, total ->
                                     scope.launch {
                                         transferProgress = if (total > 0L) {
@@ -187,7 +189,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                 }
                                 val published = RemoteBridgeDownloads.publish(context, tempFile, safeName)
                                 savedPath = published.toString()
-                                status = "File saved to public Downloads/Hazel."
+                                status = context.getString(R.string.remote_bridge_transfer_complete)
                             } catch (e: Exception) {
                                 temporary?.delete()
                                 status = e.message ?: "File download failed"
@@ -203,11 +205,11 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 transferProgress?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 OutlinedButton(enabled = isDownloadingFile, onClick = {
                     activeTransferClient?.cancelActiveFileDownload()
-                    status = "Cancelling file transfer…"
-                }) { Text("Cancel file transfer") }
-                savedPath?.let { Text("Saved file URI: $it", style = MaterialTheme.typography.bodySmall) }
+                    status = context.getString(R.string.remote_bridge_cancel_file_transfer)
+                }) { Text(stringResource(R.string.remote_bridge_cancel_file_transfer)) }
+                savedPath?.let { Text(stringResource(R.string.remote_bridge_saved_file_uri, it), style = MaterialTheme.typography.bodySmall) }
             }
         }
-        Text("Files are published to the public Downloads/Hazel folder. Keep the bridge URL private and use HTTPS for remote connections.")
+        Text(stringResource(R.string.remote_bridge_footer))
     }
 }
