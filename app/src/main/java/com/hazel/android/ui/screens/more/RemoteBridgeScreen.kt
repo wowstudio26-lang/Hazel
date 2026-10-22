@@ -181,7 +181,11 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                 transferClient.downloadFile(jobId ?: error("No job"), relative, tempFile) { downloaded, total ->
                                     scope.launch {
                                         transferProgress = if (total > 0L) {
-                                            "Downloaded ${downloaded / (1024 * 1024)} / ${total / (1024 * 1024)} MiB"
+                                            context.getString(R.string.remote_bridge_progress_known,
+                                                downloaded / (1024 * 1024), total / (1024 * 1024))
+                                        } else {
+                                            context.getString(R.string.remote_bridge_progress_unknown,
+                                                downloaded / (1024 * 1024))
                                         } else {
                                             "Downloaded ${downloaded / (1024 * 1024)} MiB"
                                         }
@@ -200,7 +204,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                 busy = false
                             }
                         }
-                    }) { Text("Download: ${relative.substringAfterLast('/')}") }
+                    }) { Text(stringResource(R.string.remote_bridge_download_file, relative.substringAfterLast('/'))) }
                 }
                 transferProgress?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 OutlinedButton(enabled = isDownloadingFile, onClick = {
