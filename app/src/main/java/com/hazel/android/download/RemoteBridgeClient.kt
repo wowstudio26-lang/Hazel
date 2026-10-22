@@ -1,7 +1,10 @@
 package com.hazel.android.download
 
 import android.net.Uri
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Call
@@ -139,6 +142,9 @@ class RemoteBridgeClient(
             val part = File(destination.parentFile ?: File("."), destination.name + ".part")
             val call = http.newCall(request)
             activeDownloadCall = call
+            val cancellationHandle = currentCoroutineContext().job.invokeOnCompletion { cause ->
+                if (cause is CancellationException) call.cancel()
+            }
             try {
                 call.execute().use { response ->
                     if (!response.isSuccessful) {
@@ -177,6 +183,7 @@ class RemoteBridgeClient(
                 part.delete()
                 throw failure
             } finally {
+                cancellationHandle.dispose()
                 if (activeDownloadCall === call) activeDownloadCall = null
             }
         }
@@ -198,6 +205,9 @@ class RemoteBridgeClient(
             .get().build()
         val call = http.newCall(request)
         activeDownloadCall = call
+        val cancellationHandle = currentCoroutineContext().job.invokeOnCompletion { cause ->
+            if (cause is CancellationException) call.cancel()
+        }
         try {
             call.execute().use { response ->
                 if (!response.isSuccessful) {
@@ -227,6 +237,7 @@ class RemoteBridgeClient(
                 downloaded
             }
         } finally {
+            cancellationHandle.dispose()
             if (activeDownloadCall === call) activeDownloadCall = null
         }
     }
