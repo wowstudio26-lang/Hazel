@@ -841,4 +841,11 @@
     <string name="remote_bridge_job_submitted">Tugas dikirim %1$s: %2$s</string>
     <string name="remote_bridge_cancel_requested">Permintaan pembatalan dikirim.</string>
     <string name="remote_bridge_file_transfer_cancelling">Membatalkan transfer file…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">Transfer file dibatalkan.</string>
+    <string name="remote_bridge_transfer_interrupted">Transfer terputus. Pilih Unduh untuk mencoba lagi.</string>
+    <string name="remote_bridge_transfer_failed">Transfer file jarak jauh gagal.</string>
+    <string name="remote_bridge_notification_channel">Transfer file jarak jauh</string>
+    <string name="remote_bridge_notification_description">Progres dan kontrol pembatalan untuk unduhan file jarak jauh.</string>
 </resources>
