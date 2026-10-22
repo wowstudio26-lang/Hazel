@@ -151,7 +151,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 jobId?.let { id ->
                     Text(stringResource(R.string.remote_bridge_job_id, id), style = MaterialTheme.typography.bodySmall)
                     EqualWidthActions(modifier = Modifier.fillMaxWidth(), spacing = 8.dp) {
-                        OutlinedButton(enabled = !busy && remoteStatus in setOf("queued", "downloading"), onClick = {
+                        OutlinedButton(enabled = !busy && remoteStatus?.let { it in setOf("queued", "downloading") } == true, onClick = {
                             scope.launch {
                                 busy = true
                                 try {
