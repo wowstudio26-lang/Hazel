@@ -86,8 +86,12 @@ class RemoteBridgeClient(
     }
 
     /** Downloads one completed bridge file to a temporary sibling, then renames it. */
-    suspend fun downloadFile(jobId: String, relativePath: String, destination: File): File =
-        withContext(Dispatchers.IO) {
+    suspend fun downloadFile(
+        jobId: String,
+        relativePath: String,
+        destination: File,
+        onProgress: (downloadedBytes: Long, totalBytes: Long) -> Unit = { _, _ -> }
+    ): File = withContext(Dispatchers.IO) {
             require(jobId.matches(Regex("^[0-9a-f]{32}$"))) { "Invalid bridge job ID" }
             val segments = relativePath.split('/').filter { it.isNotEmpty() }
             require(segments.isNotEmpty() && segments.none { it == "." || it == ".." }) {
@@ -104,8 +108,19 @@ class RemoteBridgeClient(
                         throw IOException("Bridge file request failed (${response.code}): ${responseMessage(response.body?.string())}")
                     }
                     val body = response.body ?: throw IOException("Bridge returned an empty response")
-                    body.byteStream().use { input ->
-                        part.outputStream().buffered().use { output -> input.copyTo(output) }
+                    val total = body.contentLength()
+                    var downloaded = 0L
+                    body.byteStream().buffered().use { input ->
+                        part.outputStream().buffered().use { output ->
+                            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                            while (true) {
+                                val count = input.read(buffer)
+                                if (count < 0) break
+                                output.write(buffer, 0, count)
+                                downloaded += count
+                                onProgress(downloaded, total)
+                            }
+                        }
                     }
                 }
                 if (destination.exists() && !destination.delete()) {
