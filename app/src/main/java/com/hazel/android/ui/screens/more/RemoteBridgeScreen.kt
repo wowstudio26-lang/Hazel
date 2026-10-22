@@ -33,6 +33,7 @@ import com.hazel.android.download.RemoteBridgeClient
 import com.hazel.android.download.RemoteBridgeDownloads
 import com.hazel.android.download.RemoteBridgeJobStore
 import com.hazel.android.download.RemoteBridgeSecrets
+import com.hazel.android.ui.components.EqualWidthActions
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -95,7 +96,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
         Text("Use a PC-Free bridge on a network where torrent traffic is permitted. Remote endpoints must use HTTPS.")
         OutlinedTextField(endpoint, { endpoint = it }, label = { Text("Bridge URL (HTTPS)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(token, { token = it }, label = { Text("Bearer token") }, visualTransformation = PasswordVisualTransformation(), singleLine = true, modifier = Modifier.fillMaxWidth())
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        EqualWidthActions(modifier = Modifier.fillMaxWidth(), spacing = 8.dp) {
             Button(onClick = {
                 scope.launch {
                     try {
@@ -145,7 +146,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 Text(status)
                 jobId?.let { id ->
                     Text("Job ID: $id", style = MaterialTheme.typography.bodySmall)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    EqualWidthActions(modifier = Modifier.fillMaxWidth(), spacing = 8.dp) {
                         OutlinedButton(enabled = !busy, onClick = {
                             scope.launch {
                                 busy = true
