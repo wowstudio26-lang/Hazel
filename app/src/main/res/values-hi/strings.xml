@@ -851,4 +851,11 @@
     <string name="remote_bridge_job_submitted">जॉब भेजा गया %1$s: %2$s</string>
     <string name="remote_bridge_cancel_requested">रद्द करने का अनुरोध भेजा गया।</string>
     <string name="remote_bridge_file_transfer_cancelling">फ़ाइल ट्रांसफ़र रद्द हो रहा है…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">फ़ाइल ट्रांसफ़र रद्द किया गया।</string>
+    <string name="remote_bridge_transfer_interrupted">ट्रांसफ़र रुक गया। फिर कोशिश करने के लिए डाउनलोड चुनें।</string>
+    <string name="remote_bridge_transfer_failed">रिमोट फ़ाइल ट्रांसफ़र विफल हुआ।</string>
+    <string name="remote_bridge_notification_channel">रिमोट फ़ाइल ट्रांसफ़र</string>
+    <string name="remote_bridge_notification_description">रिमोट फ़ाइल डाउनलोड की प्रगति और रद्द करने के नियंत्रण।</string>
 </resources>
