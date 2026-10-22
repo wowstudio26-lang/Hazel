@@ -906,4 +906,11 @@
     <string name="remote_bridge_job_submitted">Submitted job %1$s: %2$s</string>
     <string name="remote_bridge_cancel_requested">Cancellation requested.</string>
     <string name="remote_bridge_file_transfer_cancelling">Cancelling file transfer…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">File transfer cancelled.</string>
+    <string name="remote_bridge_transfer_interrupted">Transfer interrupted. Select Download to try again.</string>
+    <string name="remote_bridge_transfer_failed">Remote file transfer failed.</string>
+    <string name="remote_bridge_notification_channel">Remote file transfer</string>
+    <string name="remote_bridge_notification_description">Progress and cancellation controls for remote file downloads.</string>
 </resources>
