@@ -49,6 +49,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
     val savedJob = remember(context) { RemoteBridgeJobStore.load(context) }
     var magnet by remember { mutableStateOf(savedJob?.magnetUri.orEmpty()) }
     var jobId by remember { mutableStateOf<String?>(savedJob?.id) }
+    var remoteStatus by remember { mutableStateOf<String?>(null) }
     var status by remember { mutableStateOf(context.getString(R.string.remote_bridge_initial_status)) }
     var files by remember { mutableStateOf<List<String>>(emptyList()) }
     var busy by remember { mutableStateOf(false) }
@@ -70,6 +71,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
         while (true) {
             try {
                 val job = client().getJob(id)
+                remoteStatus = job.status.lowercase()
                 status = "${job.status}: ${job.message}".trim()
                 files = job.files
                 retryDelay = 5000L
@@ -133,6 +135,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 try {
                     val job = client().createMagnetJob(magnet.trim())
                     jobId = job.id
+                    remoteStatus = job.status.lowercase()
                     RemoteBridgeJobStore.save(context, job.id, magnet.trim())
                     status = context.getString(R.string.remote_bridge_job_submitted, job.id, job.status)
                     files = job.files
@@ -148,17 +151,24 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 jobId?.let { id ->
                     Text(stringResource(R.string.remote_bridge_job_id, id), style = MaterialTheme.typography.bodySmall)
                     EqualWidthActions(modifier = Modifier.fillMaxWidth(), spacing = 8.dp) {
-                        OutlinedButton(enabled = !busy, onClick = {
+                        OutlinedButton(enabled = !busy && remoteStatus in setOf("queued", "downloading"), onClick = {
                             scope.launch {
                                 busy = true
-                                try { client().cancelJob(id); status = context.getString(R.string.remote_bridge_cancel_requested) }
-                                catch (e: Exception) { status = e.message ?: "Cancel failed" }
-                                finally { busy = false }
+                                try {
+                                    client().cancelJob(id)
+                                    remoteStatus = "cancelled"
+                                    status = context.getString(R.string.remote_bridge_cancel_requested)
+                                } catch (e: Exception) {
+                                    status = e.message ?: "Cancel failed"
+                                } finally {
+                                    busy = false
+                                }
                             }
                         }) { Text(stringResource(R.string.remote_bridge_cancel_job)) }
                         OutlinedButton(enabled = !busy, onClick = {
                             RemoteBridgeJobStore.clear(context)
                             jobId = null
+                            remoteStatus = null
                             files = emptyList()
                             status = context.getString(R.string.remote_bridge_history_cleared)
                         }) { Text(stringResource(R.string.remote_bridge_forget_job)) }
