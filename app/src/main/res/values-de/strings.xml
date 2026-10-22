@@ -846,4 +846,9 @@
     <string name="remote_bridge_initial_status">Richte die Bridge ein und übermittle dann einen Magnet-Link.</string>
     <string name="remote_bridge_settings_saved">Bridge-Einstellungen wurden auf diesem Gerät verschlüsselt gespeichert.</string>
     <string name="remote_bridge_connection_success">Verbunden: %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">Auftrag %1$s übermittelt: %2$s</string>
+    <string name="remote_bridge_cancel_requested">Abbruch angefordert.</string>
+    <string name="remote_bridge_file_transfer_cancelling">Dateiübertragung wird abgebrochen…</string>
 </resources>
