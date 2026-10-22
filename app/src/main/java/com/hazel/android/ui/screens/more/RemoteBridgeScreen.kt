@@ -107,7 +107,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                         status = context.getString(R.string.remote_bridge_settings_saved)
                     } catch (e: Exception) { status = e.message ?: "Could not save settings" }
                 }
-            }) { Text("Save settings") }
+            }) { Text(stringResource(R.string.remote_bridge_save_settings)) }
             OutlinedButton(enabled = !busy, onClick = {
                 scope.launch {
                     busy = true
@@ -119,14 +119,14 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                         busy = false
                     }
                 }
-            }) { Text("Test connection") }
+            }) { Text(stringResource(R.string.remote_bridge_test_connection)) }
         }
         OutlinedButton(onClick = {
             RemoteBridgeSecrets.clear(context)
             token = ""
             endpoint = ""
             status = context.getString(R.string.remote_bridge_initial_status)
-        }) { Text("Clear bridge settings") }
+        }) { Text(stringResource(R.string.remote_bridge_clear_settings)) }
         OutlinedTextField(magnet, { magnet = it }, label = { Text(stringResource(R.string.remote_bridge_magnet_hint)) }, modifier = Modifier.fillMaxWidth(), minLines = 2)
         Button(enabled = !busy, onClick = {
             scope.launch {
@@ -135,7 +135,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                     val job = client().createMagnetJob(magnet.trim())
                     jobId = job.id
                     RemoteBridgeJobStore.save(context, job.id, magnet.trim())
-                    status = "Submitted job ${job.id}: ${job.status}"
+                    status = context.getString(R.string.remote_bridge_job_submitted, job.id, job.status)
                     files = job.files
                     savedPath = null
                 } catch (e: Exception) { status = e.message ?: "Could not submit job" }
@@ -152,7 +152,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                         OutlinedButton(enabled = !busy, onClick = {
                             scope.launch {
                                 busy = true
-                                try { client().cancelJob(id); status = context.getString(R.string.remote_bridge_cancel_job) }
+                                try { client().cancelJob(id); status = context.getString(R.string.remote_bridge_cancel_requested) }
                                 catch (e: Exception) { status = e.message ?: "Cancel failed" }
                                 finally { busy = false }
                             }
@@ -186,8 +186,6 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                         } else {
                                             context.getString(R.string.remote_bridge_progress_unknown,
                                                 downloaded / (1024 * 1024))
-                                        } else {
-                                            "Downloaded ${downloaded / (1024 * 1024)} MiB"
                                         }
                                     }
                                 }
@@ -209,7 +207,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 transferProgress?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 OutlinedButton(enabled = isDownloadingFile, onClick = {
                     activeTransferClient?.cancelActiveFileDownload()
-                    status = context.getString(R.string.remote_bridge_cancel_file_transfer)
+                    status = context.getString(R.string.remote_bridge_file_transfer_cancelling)
                 }) { Text(stringResource(R.string.remote_bridge_cancel_file_transfer)) }
                 savedPath?.let { Text(stringResource(R.string.remote_bridge_saved_file_uri, it), style = MaterialTheme.typography.bodySmall) }
             }
