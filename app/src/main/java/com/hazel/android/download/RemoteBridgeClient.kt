@@ -12,6 +12,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.io.OutputStream
+import java.io.BufferedOutputStream
 import java.util.concurrent.TimeUnit
 
 /**
@@ -168,6 +170,56 @@ class RemoteBridgeClient(
                 if (activeDownloadCall === call) activeDownloadCall = null
             }
         }
+
+    /** Streams a bridge file directly to an output sink (for example a pending MediaStore row). */
+    suspend fun downloadFileToStream(
+        jobId: String,
+        relativePath: String,
+        destination: OutputStream,
+        onProgress: (downloadedBytes: Long, totalBytes: Long) -> Unit = { _, _ -> }
+    ): Long = withContext(Dispatchers.IO) {
+        require(jobId.matches(Regex("^[0-9a-f]{32}$"))) { "Invalid bridge job ID" }
+        val segments = relativePath.split('/').filter { it.isNotEmpty() }
+        require(segments.isNotEmpty() && segments.none { it == "." || it == ".." }) {
+            "Invalid bridge file path"
+        }
+        val encodedPath = segments.joinToString("/") { Uri.encode(it) }
+        val request = authenticatedRequest("$baseUrl/api/v1/jobs/$jobId/files/$encodedPath")
+            .get().build()
+        val call = http.newCall(request)
+        activeDownloadCall = call
+        try {
+            call.execute().use { response ->
+                if (!response.isSuccessful) {
+                    throw IOException("Bridge file request failed (${response.code}): ${responseMessage(response.body?.string())}")
+                }
+                val body = response.body ?: throw IOException("Bridge returned an empty response")
+                val total = body.contentLength()
+                var downloaded = 0L
+                var lastReported = 0L
+                val output = BufferedOutputStream(destination)
+                body.byteStream().buffered().use { input ->
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    while (true) {
+                        if (call.isCanceled()) throw IOException("File transfer cancelled")
+                        val count = input.read(buffer)
+                        if (count < 0) break
+                        output.write(buffer, 0, count)
+                        downloaded += count
+                        if (downloaded - lastReported >= 512 * 1024 ||
+                            (total > 0 && downloaded >= total)) {
+                            lastReported = downloaded
+                            onProgress(downloaded, total)
+                        }
+                    }
+                }
+                output.flush()
+                downloaded
+            }
+        } finally {
+            if (activeDownloadCall === call) activeDownloadCall = null
+        }
+    }
 
     private fun authenticatedRequest(url: String): Request.Builder =
         Request.Builder()
