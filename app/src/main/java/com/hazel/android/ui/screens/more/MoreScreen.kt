@@ -91,7 +91,8 @@ fun MoreScreen(
     onNavigateToAdvanced: () -> Unit = {},
     onNavigateToBackup: () -> Unit = {},
     onNavigateToDocumentation: () -> Unit = {},
-    onNavigateToSettingsSearch: () -> Unit = {}
+    onNavigateToSettingsSearch: () -> Unit = {},
+    onNavigateToRemoteBridge: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val listingSource by remember(context) { SettingsRepository.getListingSource(context) }.collectAsState(initial = ListingSource.DEFAULT)
@@ -424,6 +425,22 @@ fun MoreScreen(
                 trailingContent = { MoreChevron() },
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 modifier = Modifier.clickable { onNavigateToConverter() }
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant
+            )
+
+            ListItem(
+                headlineContent = { Text("Remote Bridge") },
+                supportingContent = { Text("Configure PC-Free remote downloads") },
+                leadingContent = {
+                    Icon(Icons.Filled.Bolt, null, tint = MaterialTheme.colorScheme.primary)
+                },
+                trailingContent = { MoreChevron() },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                modifier = Modifier.clickable { onNavigateToRemoteBridge() }
             )
 
             HorizontalDivider(
