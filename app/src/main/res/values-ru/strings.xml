@@ -835,4 +835,34 @@
     <string name="proxy_remove">Удалить прокси</string>
     <string name="proxy_host_invalid">Введите имя хоста или IP-адрес</string>
     <string name="proxy_port_invalid">Введите порт от 1 до 65535</string>
+
+    <!-- Remote Bridge -->
+    <string name="more_remote_bridge_title">Удалённый мост</string>
+    <string name="more_remote_bridge_subtitle">Настройка удалённых загрузок PC-Free</string>
+    <string name="remote_bridge_title">Удалённый мост</string>
+    <string name="remote_bridge_intro">Используйте PC-Free в сети, где разрешены загрузки через торрент. Для удалённого адреса требуется HTTPS.</string>
+    <string name="remote_bridge_url">URL моста (HTTPS)</string>
+    <string name="remote_bridge_token">Токен Bearer</string>
+    <string name="remote_bridge_save_settings">Сохранить настройки</string>
+    <string name="remote_bridge_test_connection">Проверить соединение</string>
+    <string name="remote_bridge_clear_settings">Очистить настройки моста</string>
+    <string name="remote_bridge_magnet_hint">Magnet-ссылка BitTorrent</string>
+    <string name="remote_bridge_start_download">Начать удалённую загрузку</string>
+    <string name="remote_bridge_submitting">Отправка…</string>
+    <string name="remote_bridge_job_status">Состояние задачи</string>
+    <string name="remote_bridge_job_id">ID задачи: %1$s</string>
+    <string name="remote_bridge_cancel_job">Отменить задачу</string>
+    <string name="remote_bridge_forget_job">Забыть задачу</string>
+    <string name="remote_bridge_history_cleared">Локальная история задач очищена. Активная удалённая задача не была отменена.</string>
+    <string name="remote_bridge_download_file">Скачать: %1$s</string>
+    <string name="remote_bridge_starting_transfer">Начало передачи…</string>
+    <string name="remote_bridge_progress_known">Загружено: %1$d / %2$d МиБ</string>
+    <string name="remote_bridge_progress_unknown">Загружено: %1$d МиБ</string>
+    <string name="remote_bridge_cancel_file_transfer">Отменить передачу файла</string>
+    <string name="remote_bridge_saved_file_uri">URI сохранённого файла: %1$s</string>
+    <string name="remote_bridge_transfer_complete">Файл сохранён в общедоступной папке Downloads/Hazel.</string>
+    <string name="remote_bridge_footer">Файлы сохраняются в общедоступной папке Downloads/Hazel. Не раскрывайте URL моста и используйте HTTPS для удалённых подключений.</string>
+    <string name="remote_bridge_initial_status">Настройте мост, затем отправьте magnet-ссылку.</string>
+    <string name="remote_bridge_settings_saved">Настройки моста зашифрованы и сохранены на этом устройстве.</string>
+    <string name="remote_bridge_connection_success">Подключено: %1$s</string>
 </resources>
