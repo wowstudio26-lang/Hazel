@@ -36,6 +36,7 @@ import com.hazel.android.download.RemoteBridgeDownloads
 import com.hazel.android.download.RemoteBridgeJobStore
 import com.hazel.android.download.RemoteBridgeSecrets
 import com.hazel.android.ui.components.EqualWidthActions
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -76,7 +77,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                 files = job.files
                 retryDelay = 5000L
                 if (job.status.lowercase() in setOf("complete", "completed", "failed", "cancelled", "canceled", "error")) break
-            } catch (e: Exception) {
+            } catch (e: CancellationException) { throw e } catch (e: Exception) {
                 val message = e.message ?: "Could not refresh remote job"
                 status = message
                 if (listOf("(401)", "(403)", "(404)").any(message::contains)) break
@@ -106,7 +107,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                         client()
                         RemoteBridgeSecrets.save(context, endpoint, token)
                         status = context.getString(R.string.remote_bridge_settings_saved)
-                    } catch (e: Exception) { status = e.message ?: "Could not save settings" }
+                    } catch (e: CancellationException) { throw e } catch (e: Exception) { status = e.message ?: "Could not save settings" }
                 }
             }) { Text(stringResource(R.string.remote_bridge_save_settings)) }
             OutlinedButton(enabled = !busy, onClick = {
@@ -114,7 +115,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                     busy = true
                     try {
                         status = context.getString(R.string.remote_bridge_connection_success, client().checkConnection())
-                    } catch (e: Exception) {
+                    } catch (e: CancellationException) { throw e } catch (e: Exception) {
                         status = e.message ?: "Bridge connection failed"
                     } finally {
                         busy = false
@@ -140,7 +141,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                     status = context.getString(R.string.remote_bridge_job_submitted, job.id, job.status)
                     files = job.files
                     savedPath = null
-                } catch (e: Exception) { status = e.message ?: "Could not submit job" }
+                } catch (e: CancellationException) { throw e } catch (e: Exception) { status = e.message ?: "Could not submit job" }
                 finally { busy = false }
             }
         }) { Text(if (busy) stringResource(R.string.remote_bridge_submitting) else stringResource(R.string.remote_bridge_start_download)) }
@@ -158,7 +159,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                     client().cancelJob(id)
                                     remoteStatus = "cancelled"
                                     status = context.getString(R.string.remote_bridge_cancel_requested)
-                                } catch (e: Exception) {
+                                } catch (e: CancellationException) { throw e } catch (e: Exception) {
                                     status = e.message ?: "Cancel failed"
                                 } finally {
                                     busy = false
@@ -203,7 +204,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                                 }
                                 savedPath = published.toString()
                                 status = context.getString(R.string.remote_bridge_transfer_complete)
-                            } catch (e: Exception) {
+                            } catch (e: CancellationException) { throw e } catch (e: Exception) {
                                 status = e.message ?: "File download failed"
                             } finally {
                                 activeTransferClient = null
