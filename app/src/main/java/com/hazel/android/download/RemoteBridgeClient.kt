@@ -70,6 +70,16 @@ class RemoteBridgeClient(
             if (!response.isSuccessful) throw IOException("Bridge health check failed (${response.code})")
             val json = JSONObject(raw)
             if (json.optString("status") != "ok") throw IOException("Bridge health check returned an unexpected status")
+            // Health is public; also hit an authenticated endpoint so the UI does not report
+            // success when the URL is reachable but the saved bearer token is wrong.
+            val authRequest = authenticatedRequest("$baseUrl/api/v1/jobs").get().build()
+            http.newCall(authRequest).execute().use { authResponse ->
+                val authBody = authResponse.body?.string().orEmpty()
+                if (!authResponse.isSuccessful) {
+                    throw IOException("Bridge authentication check failed (${authResponse.code}): ${responseMessage(authBody)}")
+                }
+                JSONArray(authBody)
+            }
             json.optString("service", "PC-Free bridge")
         }
     }
