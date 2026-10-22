@@ -868,4 +868,5 @@
     <string name="remote_bridge_transfer_failed">Falha na transferência do arquivo remoto.</string>
     <string name="remote_bridge_notification_channel">Transferência de arquivo remoto</string>
     <string name="remote_bridge_notification_description">Progresso e controles de cancelamento para downloads remotos.</string>
+    <string name="remote_bridge_retry_transfer">Tentar transferência novamente</string>
 </resources>
