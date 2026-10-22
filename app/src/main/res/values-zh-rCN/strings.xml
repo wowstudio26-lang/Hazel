@@ -836,4 +836,9 @@
     <string name="remote_bridge_initial_status">配置桥接后，提交磁力链接。</string>
     <string name="remote_bridge_settings_saved">桥接设置已在此设备上加密保存。</string>
     <string name="remote_bridge_connection_success">已连接：%1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">已提交任务 %1$s：%2$s</string>
+    <string name="remote_bridge_cancel_requested">已请求取消。</string>
+    <string name="remote_bridge_file_transfer_cancelling">正在取消文件传输…</string>
 </resources>
