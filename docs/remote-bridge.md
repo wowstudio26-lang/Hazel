@@ -30,7 +30,7 @@ Use the companion [PC-Free bridge pull request](https://github.com/wowstudio26-l
 - A completed job and its available files survive a container restart.
 - Queued/interrupted jobs are rescheduled using their original job folder. aria2 can resume partial files when its control files are intact; when those files are missing or damaged, it may need to restart the transfer.
 - Hazel stores the last job ID and magnet locally so it can query the bridge again when reopened. If the bridge has lost or no longer recognises the job, the screen reports the API error.
-- Downloads run from the Remote Bridge screen's coroutine scope. They are not yet part of Hazel's canonical persistent download queue and do not have a dedicated background worker/notification. Keep Hazel in a stable foreground session during large file transfers until background transfer support is added.
+- Completed-file transfers run in a dedicated Android data-sync foreground service with a persistent progress notification and cancel action. Transfer progress and the selected remote file are recorded locally; if the process is gone and an active transfer is found on reopen, the UI marks it interrupted and offers retry. Transfers are still separate from Hazel's canonical persistent media download queue.
 
 ## Security and limitations
 
