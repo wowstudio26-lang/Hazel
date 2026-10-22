@@ -8,9 +8,75 @@ import android.os.Environment
 import android.provider.MediaStore
 import java.io.File
 import java.io.IOException
+import java.util.UUID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /** Publishes a completed temporary bridge download into the user's public Downloads/Hazel folder. */
 object RemoteBridgeDownloads {
+    /**
+     * Streams directly into a pending public Downloads entry on Android 10+, avoiding a
+     * second full-size cache copy for large files. Older versions use app-specific temporary
+     * storage before copying to the public Downloads folder.
+     */
+    suspend fun downloadAndPublish(
+        context: Context,
+        client: RemoteBridgeClient,
+        jobId: String,
+        relativePath: String,
+        displayName: String,
+        onProgress: (downloadedBytes: Long, totalBytes: Long) -> Unit = { _, _ -> }
+    ): Uri = withContext(Dispatchers.IO) {
+        val safeName = displayName.substringAfterLast('/').substringAfterLast(92.toChar())
+            .filterNot { ch ->
+                ch < ' ' || ch == 92.toChar() || ch == '/' || ch == ':' || ch == '*' ||
+                    ch == '?' || ch == '"' || ch == '<' || ch == '>' || ch == '|'
+            }
+            .trim()
+            .ifBlank { "remote-download.bin" }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val resolver = context.contentResolver
+            val finalName = uniqueMediaStoreName(context, safeName)
+            val values = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, finalName)
+                put(MediaStore.Downloads.MIME_TYPE, mimeType(safeName))
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Hazel")
+                put(MediaStore.Downloads.IS_PENDING, 1)
+            }
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+                ?: throw IOException("Could not create public Downloads entry")
+            try {
+                resolver.openOutputStream(uri, "w")?.use { output ->
+                    client.downloadFileToStream(jobId, relativePath, output, onProgress)
+                } ?: throw IOException("Could not open public Downloads entry")
+                val publish = ContentValues().apply { put(MediaStore.Downloads.IS_PENDING, 0) }
+                if (resolver.update(uri, publish, null, null) <= 0) {
+                    throw IOException("Could not publish file in Downloads/Hazel")
+                }
+                uri
+            } catch (failure: Exception) {
+                resolver.delete(uri, null, null)
+                throw failure
+            }
+        } else {
+            val tempRoot = File(
+                context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: context.filesDir,
+                "remote-bridge-temp"
+            )
+            if (!tempRoot.exists() && !tempRoot.mkdirs()) {
+                throw IOException("Could not create temporary download folder")
+            }
+            val temporary = File(tempRoot, UUID.randomUUID().toString() + ".part")
+            try {
+                client.downloadFile(jobId, relativePath, temporary, onProgress)
+                publish(context, temporary, safeName)
+            } finally {
+                temporary.delete()
+            }
+        }
+    }
+
     fun publish(context: Context, source: File, displayName: String): Uri {
         require(source.isFile) { "Downloaded file is missing" }
         val safeName = displayName.substringAfterLast('/').substringAfterLast('\\')
