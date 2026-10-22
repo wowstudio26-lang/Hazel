@@ -806,4 +806,34 @@
     <string name="proxy_remove">プロキシを削除</string>
     <string name="proxy_host_invalid">ホスト名または IP アドレスを入力</string>
     <string name="proxy_port_invalid">1〜65535 のポートを入力</string>
+
+    <!-- Remote Bridge -->
+    <string name="more_remote_bridge_title">リモートブリッジ</string>
+    <string name="more_remote_bridge_subtitle">PC-Free のリモートダウンロードを設定</string>
+    <string name="remote_bridge_title">リモートブリッジ</string>
+    <string name="remote_bridge_intro">トレントのダウンロードが許可されているネットワークで PC-Free を使用してください。リモートブリッジの URL には HTTPS が必要です。</string>
+    <string name="remote_bridge_url">ブリッジ URL（HTTPS）</string>
+    <string name="remote_bridge_token">Bearer トークン</string>
+    <string name="remote_bridge_save_settings">設定を保存</string>
+    <string name="remote_bridge_test_connection">接続をテスト</string>
+    <string name="remote_bridge_clear_settings">ブリッジ設定を消去</string>
+    <string name="remote_bridge_magnet_hint">BitTorrent マグネットリンク</string>
+    <string name="remote_bridge_start_download">リモートダウンロードを開始</string>
+    <string name="remote_bridge_submitting">送信中…</string>
+    <string name="remote_bridge_job_status">ジョブの状態</string>
+    <string name="remote_bridge_job_id">ジョブ ID：%1$s</string>
+    <string name="remote_bridge_cancel_job">ジョブをキャンセル</string>
+    <string name="remote_bridge_forget_job">ジョブを削除</string>
+    <string name="remote_bridge_history_cleared">ローカルのジョブ履歴を消去しました。実行中のリモートタスクはキャンセルされていません。</string>
+    <string name="remote_bridge_download_file">ダウンロード：%1$s</string>
+    <string name="remote_bridge_starting_transfer">転送を開始中…</string>
+    <string name="remote_bridge_progress_known">ダウンロード済み %1$d / %2$d MiB</string>
+    <string name="remote_bridge_progress_unknown">ダウンロード済み %1$d MiB</string>
+    <string name="remote_bridge_cancel_file_transfer">ファイル転送をキャンセル</string>
+    <string name="remote_bridge_saved_file_uri">保存したファイル URI：%1$s</string>
+    <string name="remote_bridge_transfer_complete">ファイルを公開 Downloads/Hazel フォルダーに保存しました。</string>
+    <string name="remote_bridge_footer">ファイルは公開 Downloads/Hazel フォルダーに保存されます。ブリッジ URL を秘密にし、リモート接続には HTTPS を使用してください。</string>
+    <string name="remote_bridge_initial_status">ブリッジを設定し、マグネットリンクを送信してください。</string>
+    <string name="remote_bridge_settings_saved">ブリッジ設定をこの端末に暗号化して保存しました。</string>
+    <string name="remote_bridge_connection_success">接続済み：%1$s</string>
 </resources>
