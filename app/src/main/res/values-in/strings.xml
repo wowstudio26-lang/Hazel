@@ -806,4 +806,34 @@
     <string name="proxy_remove">Hapus proxy</string>
     <string name="proxy_host_invalid">Masukkan nama host atau alamat IP</string>
     <string name="proxy_port_invalid">Masukkan port 1 sampai 65535</string>
+
+    <!-- Remote Bridge -->
+    <string name="more_remote_bridge_title">Remote Bridge</string>
+    <string name="more_remote_bridge_subtitle">Atur unduhan jarak jauh PC-Free</string>
+    <string name="remote_bridge_title">Remote Bridge</string>
+    <string name="remote_bridge_intro">Gunakan PC-Free pada jaringan yang mengizinkan unduhan torrent. URL bridge jarak jauh harus menggunakan HTTPS.</string>
+    <string name="remote_bridge_url">URL bridge (HTTPS)</string>
+    <string name="remote_bridge_token">Token Bearer</string>
+    <string name="remote_bridge_save_settings">Simpan pengaturan</string>
+    <string name="remote_bridge_test_connection">Uji koneksi</string>
+    <string name="remote_bridge_clear_settings">Hapus pengaturan bridge</string>
+    <string name="remote_bridge_magnet_hint">Tautan magnet BitTorrent</string>
+    <string name="remote_bridge_start_download">Mulai unduhan jarak jauh</string>
+    <string name="remote_bridge_submitting">Mengirim…</string>
+    <string name="remote_bridge_job_status">Status tugas</string>
+    <string name="remote_bridge_job_id">ID tugas: %1$s</string>
+    <string name="remote_bridge_cancel_job">Batalkan tugas</string>
+    <string name="remote_bridge_forget_job">Lupakan tugas</string>
+    <string name="remote_bridge_history_cleared">Riwayat tugas lokal dihapus. Tugas jarak jauh yang aktif tidak dibatalkan.</string>
+    <string name="remote_bridge_download_file">Unduh: %1$s</string>
+    <string name="remote_bridge_starting_transfer">Memulai transfer…</string>
+    <string name="remote_bridge_progress_known">Diunduh %1$d / %2$d MiB</string>
+    <string name="remote_bridge_progress_unknown">Diunduh %1$d MiB</string>
+    <string name="remote_bridge_cancel_file_transfer">Batalkan transfer file</string>
+    <string name="remote_bridge_saved_file_uri">URI file tersimpan: %1$s</string>
+    <string name="remote_bridge_transfer_complete">File disimpan di folder publik Downloads/Hazel.</string>
+    <string name="remote_bridge_footer">File disimpan ke folder publik Downloads/Hazel. Jaga URL bridge tetap rahasia dan gunakan HTTPS untuk koneksi jarak jauh.</string>
+    <string name="remote_bridge_initial_status">Atur bridge, lalu kirim tautan magnet.</string>
+    <string name="remote_bridge_settings_saved">Pengaturan bridge disimpan dengan aman di perangkat ini.</string>
+    <string name="remote_bridge_connection_success">Terhubung: %1$s</string>
 </resources>
