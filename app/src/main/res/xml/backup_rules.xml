@@ -10,4 +10,5 @@
     <include domain="file" path="datastore/" />
     <exclude domain="sharedpref" path="remote_bridge_secure.xml" />
     <exclude domain="sharedpref" path="remote_bridge_jobs.xml" />
+    <exclude domain="sharedpref" path="remote_bridge_transfer.xml" />
 </full-backup-content>
