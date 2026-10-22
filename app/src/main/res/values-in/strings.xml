@@ -836,4 +836,9 @@
     <string name="remote_bridge_initial_status">Atur bridge, lalu kirim tautan magnet.</string>
     <string name="remote_bridge_settings_saved">Pengaturan bridge disimpan dengan aman di perangkat ini.</string>
     <string name="remote_bridge_connection_success">Terhubung: %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">Tugas dikirim %1$s: %2$s</string>
+    <string name="remote_bridge_cancel_requested">Permintaan pembatalan dikirim.</string>
+    <string name="remote_bridge_file_transfer_cancelling">Membatalkan transfer file…</string>
 </resources>
