@@ -871,4 +871,47 @@
     <string name="proxy_remove">Remove proxy</string>
     <string name="proxy_host_invalid">Enter a host name or IP address</string>
     <string name="proxy_port_invalid">Enter a port from 1 to 65535</string>
+
+    <!-- Remote Bridge -->
+    <string name="more_remote_bridge_title">Remote Bridge</string>
+    <string name="more_remote_bridge_subtitle">Configure PC-Free remote downloads</string>
+    <string name="remote_bridge_title">Remote Bridge</string>
+    <string name="remote_bridge_intro">Use PC-Free on a network where torrent downloads are permitted. Remote bridge URLs must use HTTPS.</string>
+    <string name="remote_bridge_url">Bridge URL (HTTPS)</string>
+    <string name="remote_bridge_token">Bearer token</string>
+    <string name="remote_bridge_save_settings">Save settings</string>
+    <string name="remote_bridge_test_connection">Test connection</string>
+    <string name="remote_bridge_clear_settings">Clear bridge settings</string>
+    <string name="remote_bridge_magnet_hint">BitTorrent magnet link</string>
+    <string name="remote_bridge_start_download">Start remote download</string>
+    <string name="remote_bridge_submitting">Submitting…</string>
+    <string name="remote_bridge_job_status">Job status</string>
+    <string name="remote_bridge_job_id">Job ID: %1$s</string>
+    <string name="remote_bridge_cancel_job">Cancel job</string>
+    <string name="remote_bridge_forget_job">Forget job</string>
+    <string name="remote_bridge_history_cleared">Local job history cleared. The remote task, if active, was not cancelled.</string>
+    <string name="remote_bridge_download_file">Download: %1$s</string>
+    <string name="remote_bridge_starting_transfer">Starting transfer…</string>
+    <string name="remote_bridge_progress_known">Downloaded %1$d / %2$d MiB</string>
+    <string name="remote_bridge_progress_unknown">Downloaded %1$d MiB</string>
+    <string name="remote_bridge_cancel_file_transfer">Cancel file transfer</string>
+    <string name="remote_bridge_saved_file_uri">Saved file URI: %1$s</string>
+    <string name="remote_bridge_transfer_complete">File saved to public Downloads/Hazel.</string>
+    <string name="remote_bridge_footer">Files are published to the public Downloads/Hazel folder. Keep the bridge URL private and use HTTPS for remote connections.</string>
+    <string name="remote_bridge_initial_status">Configure your bridge, then submit a magnet link.</string>
+    <string name="remote_bridge_settings_saved">Bridge settings saved securely on this device.</string>
+    <string name="remote_bridge_connection_success">Connected: %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">Submitted job %1$s: %2$s</string>
+    <string name="remote_bridge_cancel_requested">Cancellation requested.</string>
+    <string name="remote_bridge_file_transfer_cancelling">Cancelling file transfer…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">File transfer cancelled.</string>
+    <string name="remote_bridge_transfer_interrupted">Transfer interrupted. Select Download to try again.</string>
+    <string name="remote_bridge_transfer_failed">Remote file transfer failed.</string>
+    <string name="remote_bridge_notification_channel">Remote file transfer</string>
+    <string name="remote_bridge_notification_description">Progress and cancellation controls for remote file downloads.</string>
+    <string name="remote_bridge_retry_transfer">Retry transfer</string>
 </resources>

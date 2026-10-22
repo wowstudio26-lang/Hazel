@@ -816,4 +816,47 @@
     <string name="proxy_remove">प्रॉक्सी हटाएं</string>
     <string name="proxy_host_invalid">होस्ट नेम या IP पता डालें</string>
     <string name="proxy_port_invalid">1 से 65535 के बीच पोर्ट डालें</string>
+
+    <!-- Remote Bridge -->
+    <string name="more_remote_bridge_title">रिमोट ब्रिज</string>
+    <string name="more_remote_bridge_subtitle">PC-Free रिमोट डाउनलोड सेट करें</string>
+    <string name="remote_bridge_title">रिमोट ब्रिज</string>
+    <string name="remote_bridge_intro">PC-Free का उपयोग ऐसे नेटवर्क पर करें जहाँ टोरेंट डाउनलोड की अनुमति हो। रिमोट ब्रिज URL में HTTPS होना चाहिए।</string>
+    <string name="remote_bridge_url">ब्रिज URL (HTTPS)</string>
+    <string name="remote_bridge_token">Bearer टोकन</string>
+    <string name="remote_bridge_save_settings">सेटिंग सेव करें</string>
+    <string name="remote_bridge_test_connection">कनेक्शन जाँचें</string>
+    <string name="remote_bridge_clear_settings">ब्रिज सेटिंग मिटाएँ</string>
+    <string name="remote_bridge_magnet_hint">BitTorrent मैग्नेट लिंक</string>
+    <string name="remote_bridge_start_download">रिमोट डाउनलोड शुरू करें</string>
+    <string name="remote_bridge_submitting">भेजा जा रहा है…</string>
+    <string name="remote_bridge_job_status">जॉब की स्थिति</string>
+    <string name="remote_bridge_job_id">जॉब ID: %1$s</string>
+    <string name="remote_bridge_cancel_job">जॉब रद्द करें</string>
+    <string name="remote_bridge_forget_job">जॉब भूलें</string>
+    <string name="remote_bridge_history_cleared">लोकल जॉब इतिहास मिटा दिया गया। सक्रिय रिमोट कार्य रद्द नहीं हुआ है।</string>
+    <string name="remote_bridge_download_file">डाउनलोड करें: %1$s</string>
+    <string name="remote_bridge_starting_transfer">ट्रांसफ़र शुरू हो रहा है…</string>
+    <string name="remote_bridge_progress_known">डाउनलोड: %1$d / %2$d MiB</string>
+    <string name="remote_bridge_progress_unknown">डाउनलोड: %1$d MiB</string>
+    <string name="remote_bridge_cancel_file_transfer">फ़ाइल ट्रांसफ़र रद्द करें</string>
+    <string name="remote_bridge_saved_file_uri">सेव की गई फ़ाइल URI: %1$s</string>
+    <string name="remote_bridge_transfer_complete">फ़ाइल सार्वजनिक Downloads/Hazel फ़ोल्डर में सेव हुई।</string>
+    <string name="remote_bridge_footer">फ़ाइलें सार्वजनिक Downloads/Hazel फ़ोल्डर में सेव होती हैं। ब्रिज URL निजी रखें और रिमोट कनेक्शन के लिए HTTPS उपयोग करें।</string>
+    <string name="remote_bridge_initial_status">ब्रिज सेट करें, फिर मैग्नेट लिंक भेजें।</string>
+    <string name="remote_bridge_settings_saved">ब्रिज सेटिंग इस डिवाइस पर सुरक्षित रूप से सेव हुई।</string>
+    <string name="remote_bridge_connection_success">कनेक्ट हुआ: %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">जॉब भेजा गया %1$s: %2$s</string>
+    <string name="remote_bridge_cancel_requested">रद्द करने का अनुरोध भेजा गया।</string>
+    <string name="remote_bridge_file_transfer_cancelling">फ़ाइल ट्रांसफ़र रद्द हो रहा है…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">फ़ाइल ट्रांसफ़र रद्द किया गया।</string>
+    <string name="remote_bridge_transfer_interrupted">ट्रांसफ़र रुक गया। फिर कोशिश करने के लिए डाउनलोड चुनें।</string>
+    <string name="remote_bridge_transfer_failed">रिमोट फ़ाइल ट्रांसफ़र विफल हुआ।</string>
+    <string name="remote_bridge_notification_channel">रिमोट फ़ाइल ट्रांसफ़र</string>
+    <string name="remote_bridge_notification_description">रिमोट फ़ाइल डाउनलोड की प्रगति और रद्द करने के नियंत्रण।</string>
+    <string name="remote_bridge_retry_transfer">ट्रांसफ़र फिर से आज़माएँ</string>
 </resources>

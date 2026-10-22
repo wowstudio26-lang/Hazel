@@ -826,4 +826,47 @@
     <string name="proxy_remove">Supprimer le proxy</string>
     <string name="proxy_host_invalid">Saisissez un nom d\'hôte ou une adresse IP</string>
     <string name="proxy_port_invalid">Saisissez un port entre 1 et 65535</string>
+
+    <!-- Remote Bridge -->
+    <string name="more_remote_bridge_title">Pont distant</string>
+    <string name="more_remote_bridge_subtitle">Configurer les téléchargements distants PC-Free</string>
+    <string name="remote_bridge_title">Pont distant</string>
+    <string name="remote_bridge_intro">Utilisez PC-Free sur un réseau autorisant les téléchargements torrent. Les URL du pont distant doivent utiliser HTTPS.</string>
+    <string name="remote_bridge_url">URL du pont (HTTPS)</string>
+    <string name="remote_bridge_token">Jeton Bearer</string>
+    <string name="remote_bridge_save_settings">Enregistrer les réglages</string>
+    <string name="remote_bridge_test_connection">Tester la connexion</string>
+    <string name="remote_bridge_clear_settings">Effacer les réglages du pont</string>
+    <string name="remote_bridge_magnet_hint">Lien magnet BitTorrent</string>
+    <string name="remote_bridge_start_download">Démarrer le téléchargement distant</string>
+    <string name="remote_bridge_submitting">Envoi…</string>
+    <string name="remote_bridge_job_status">État de la tâche</string>
+    <string name="remote_bridge_job_id">ID de tâche : %1$s</string>
+    <string name="remote_bridge_cancel_job">Annuler la tâche</string>
+    <string name="remote_bridge_forget_job">Oublier la tâche</string>
+    <string name="remote_bridge_history_cleared">Historique local effacé. La tâche distante, si elle est active, n’a pas été annulée.</string>
+    <string name="remote_bridge_download_file">Télécharger : %1$s</string>
+    <string name="remote_bridge_starting_transfer">Démarrage du transfert…</string>
+    <string name="remote_bridge_progress_known">Téléchargé : %1$d / %2$d Mio</string>
+    <string name="remote_bridge_progress_unknown">Téléchargé : %1$d Mio</string>
+    <string name="remote_bridge_cancel_file_transfer">Annuler le transfert</string>
+    <string name="remote_bridge_saved_file_uri">URI du fichier enregistré : %1$s</string>
+    <string name="remote_bridge_transfer_complete">Fichier enregistré dans le dossier public Downloads/Hazel.</string>
+    <string name="remote_bridge_footer">Les fichiers sont publiés dans le dossier public Downloads/Hazel. Gardez l’URL privée et utilisez HTTPS pour les connexions distantes.</string>
+    <string name="remote_bridge_initial_status">Configurez le pont, puis envoyez un lien magnet.</string>
+    <string name="remote_bridge_settings_saved">Les réglages du pont sont enregistrés de façon chiffrée sur cet appareil.</string>
+    <string name="remote_bridge_connection_success">Connecté : %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">Tâche envoyée %1$s : %2$s</string>
+    <string name="remote_bridge_cancel_requested">Annulation demandée.</string>
+    <string name="remote_bridge_file_transfer_cancelling">Annulation du transfert du fichier…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">Transfert du fichier annulé.</string>
+    <string name="remote_bridge_transfer_interrupted">Transfert interrompu. Sélectionnez Télécharger pour réessayer.</string>
+    <string name="remote_bridge_transfer_failed">Échec du transfert du fichier distant.</string>
+    <string name="remote_bridge_notification_channel">Transfert de fichier distant</string>
+    <string name="remote_bridge_notification_description">Progression et commandes d’annulation des téléchargements distants.</string>
+    <string name="remote_bridge_retry_transfer">Réessayer le transfert</string>
 </resources>
