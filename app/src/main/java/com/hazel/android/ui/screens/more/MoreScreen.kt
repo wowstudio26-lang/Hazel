@@ -433,8 +433,8 @@ fun MoreScreen(
             )
 
             ListItem(
-                headlineContent = { Text("Remote Bridge") },
-                supportingContent = { Text("Configure PC-Free remote downloads") },
+                headlineContent = { Text(stringResource(R.string.more_remote_bridge_title)) },
+                supportingContent = { Text(stringResource(R.string.more_remote_bridge_subtitle)) },
                 leadingContent = {
                     Icon(Icons.Filled.Bolt, null, tint = MaterialTheme.colorScheme.primary)
                 },
