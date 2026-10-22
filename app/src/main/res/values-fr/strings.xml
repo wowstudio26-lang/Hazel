@@ -856,4 +856,9 @@
     <string name="remote_bridge_initial_status">Configurez le pont, puis envoyez un lien magnet.</string>
     <string name="remote_bridge_settings_saved">Les réglages du pont sont enregistrés de façon chiffrée sur cet appareil.</string>
     <string name="remote_bridge_connection_success">Connecté : %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">Tâche envoyée %1$s : %2$s</string>
+    <string name="remote_bridge_cancel_requested">Annulation demandée.</string>
+    <string name="remote_bridge_file_transfer_cancelling">Annulation du transfert du fichier…</string>
 </resources>
