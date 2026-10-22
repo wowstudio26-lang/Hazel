@@ -45,6 +45,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
     var files by remember { mutableStateOf<List<String>>(emptyList()) }
     var busy by remember { mutableStateOf(false) }
     var savedPath by remember { mutableStateOf<String?>(null) }
+    var transferProgress by remember { mutableStateOf<String?>(null) }
 
     fun client(): RemoteBridgeClient {
         require(endpoint.isNotBlank()) { "Enter the bridge HTTPS URL" }
@@ -129,7 +130,16 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                             try {
                                 val safeName = relative.substringAfterLast('/').ifBlank { "remote-download.bin" }
                                 val temporary = File(context.cacheDir, "remote-bridge-${System.currentTimeMillis()}.part")
-                                client().downloadFile(jobId ?: error("No job"), relative, temporary)
+                                transferProgress = "Preparing download…"
+                                client().downloadFile(jobId ?: error("No job"), relative, temporary) { downloaded, total ->
+                                    scope.launch {
+                                        transferProgress = if (total > 0L) {
+                                            "Downloaded ${downloaded / (1024 * 1024)} / ${total / (1024 * 1024)} MiB"
+                                        } else {
+                                            "Downloaded ${downloaded / (1024 * 1024)} MiB"
+                                        }
+                                    }
+                                }
                                 val published = RemoteBridgeDownloads.publish(context, temporary, safeName)
                                 temporary.delete()
                                 savedPath = published.toString()
@@ -139,6 +149,7 @@ fun RemoteBridgeScreen(onBack: () -> Unit = {}) {
                         }
                     }) { Text("Download: ${relative.substringAfterLast('/')}") }
                 }
+                transferProgress?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 savedPath?.let { Text("Saved file URI: $it", style = MaterialTheme.typography.bodySmall) }
             }
         }
