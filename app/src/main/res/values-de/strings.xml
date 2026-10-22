@@ -851,4 +851,11 @@
     <string name="remote_bridge_job_submitted">Auftrag %1$s übermittelt: %2$s</string>
     <string name="remote_bridge_cancel_requested">Abbruch angefordert.</string>
     <string name="remote_bridge_file_transfer_cancelling">Dateiübertragung wird abgebrochen…</string>
+
+    <!-- Remote transfer service -->
+    <string name="remote_bridge_cancelled">Dateiübertragung abgebrochen.</string>
+    <string name="remote_bridge_transfer_interrupted">Übertragung unterbrochen. Wähle Download, um es erneut zu versuchen.</string>
+    <string name="remote_bridge_transfer_failed">Die Übertragung der Remote-Datei ist fehlgeschlagen.</string>
+    <string name="remote_bridge_notification_channel">Remote-Dateiübertragung</string>
+    <string name="remote_bridge_notification_description">Fortschritt und Abbruchoptionen für Remote-Dateidownloads.</string>
 </resources>
