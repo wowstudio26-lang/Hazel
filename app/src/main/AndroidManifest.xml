@@ -111,6 +111,12 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <!-- Keeps an explicit user-requested remote file transfer alive while Hazel is in the background. -->
+        <service
+            android:name=".download.RemoteBridgeTransferService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
         <!--
              Carries the notification's Pause, Resume and Cancel buttons to the download
              they belong to. Not exported: nothing outside the app has any business
