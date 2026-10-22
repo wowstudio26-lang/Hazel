@@ -856,4 +856,9 @@
     <string name="remote_bridge_initial_status">Configure a ponte e envie um link magnet.</string>
     <string name="remote_bridge_settings_saved">As configurações da ponte foram salvas com segurança neste dispositivo.</string>
     <string name="remote_bridge_connection_success">Conectado: %1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">Tarefa enviada %1$s: %2$s</string>
+    <string name="remote_bridge_cancel_requested">Cancelamento solicitado.</string>
+    <string name="remote_bridge_file_transfer_cancelling">Cancelando transferência do arquivo…</string>
 </resources>
