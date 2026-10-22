@@ -858,4 +858,5 @@
     <string name="remote_bridge_transfer_failed">रिमोट फ़ाइल ट्रांसफ़र विफल हुआ।</string>
     <string name="remote_bridge_notification_channel">रिमोट फ़ाइल ट्रांसफ़र</string>
     <string name="remote_bridge_notification_description">रिमोट फ़ाइल डाउनलोड की प्रगति और रद्द करने के नियंत्रण।</string>
+    <string name="remote_bridge_retry_transfer">ट्रांसफ़र फिर से आज़माएँ</string>
 </resources>
