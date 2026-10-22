@@ -66,6 +66,7 @@ import com.hazel.android.ui.screens.history.HistoryScreen
 import com.hazel.android.ui.screens.more.AppearanceScreen
 import com.hazel.android.ui.screens.more.SponsorScreen
 import com.hazel.android.ui.screens.more.FetchSettingsScreen
+import com.hazel.android.ui.screens.more.RemoteBridgeScreen
 import com.hazel.android.ui.screens.more.MoreScreen
 import com.hazel.android.ui.screens.more.StorageCleanupScreen
 import com.hazel.android.ui.screens.more.StorageLocationsScreen
@@ -142,7 +143,7 @@ fun AppNavigation(
     val currentRoute = navBackStackEntry?.destination?.route
     val isSubScreen = currentRoute in listOf(
         "storage_locations", "appearance", "tools", "converter", "update", "cookies", "fetch_settings", "storage_cleanup", "sponsor", "software_update", "hazel_update", "ytdlp_update",
-        "processing", "advanced", "proxy"
+        "processing", "advanced", "proxy", "remote_bridge"
     )
 
     val downloadViewModel: com.hazel.android.download.DownloadViewModel =
@@ -358,8 +359,12 @@ fun AppNavigation(
                     onNavigateToStorageCleanup = { navController.navigate("storage_cleanup") },
                     onNavigateToUpdate = { navController.navigate("software_update") },
                     onNavigateToDocumentation = { navController.navigate("docs") },
-                    onNavigateToSettingsSearch = { navController.navigate("settings_search") }
+                    onNavigateToSettingsSearch = { navController.navigate("settings_search") },
+                    onNavigateToRemoteBridge = { navController.navigate("remote_bridge") }
                 )
+            }
+            composable("remote_bridge") {
+                RemoteBridgeScreen(onBack = { navController.popBackStack() })
             }
             composable("settings_search") {
                 com.hazel.android.ui.screens.more.SettingsSearchScreen(
