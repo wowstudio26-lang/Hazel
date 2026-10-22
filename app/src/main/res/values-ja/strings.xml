@@ -836,4 +836,9 @@
     <string name="remote_bridge_initial_status">ブリッジを設定し、マグネットリンクを送信してください。</string>
     <string name="remote_bridge_settings_saved">ブリッジ設定をこの端末に暗号化して保存しました。</string>
     <string name="remote_bridge_connection_success">接続済み：%1$s</string>
+
+    <!-- Remote Bridge state -->
+    <string name="remote_bridge_job_submitted">ジョブを送信しました %1$s：%2$s</string>
+    <string name="remote_bridge_cancel_requested">キャンセルをリクエストしました。</string>
+    <string name="remote_bridge_file_transfer_cancelling">ファイル転送をキャンセル中…</string>
 </resources>
