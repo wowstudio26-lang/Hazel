@@ -38,6 +38,7 @@ class RemoteBridgeTransferService : Service() {
     private var cancelRequested = false
 
     private var transferJob: Job? = null
+    private var latestStartId: Int = 0
 
     override fun onCreate() {
         super.onCreate()
@@ -48,6 +49,7 @@ class RemoteBridgeTransferService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        latestStartId = startId
         when (intent?.action) {
             ACTION_CANCEL -> handleCancel(startId)
             ACTION_START -> handleStart(intent, startId)
@@ -199,7 +201,7 @@ class RemoteBridgeTransferService : Service() {
         } finally {
             activeClient = null
             withContext(NonCancellable + Dispatchers.Main.immediate) {
-                stopForegroundAndSelf(startId)
+                stopForegroundAndSelf()
             }
         }
     }
@@ -302,9 +304,9 @@ class RemoteBridgeTransferService : Service() {
         message = getString(R.string.remote_bridge_cancelled)
     )
 
-    private fun stopForegroundAndSelf(startId: Int) {
+    private fun stopForegroundAndSelf() {
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
-        stopSelf(startId)
+        stopSelf(latestStartId)
     }
 
     override fun onDestroy() {
