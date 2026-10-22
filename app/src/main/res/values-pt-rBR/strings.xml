@@ -826,4 +826,34 @@
     <string name="proxy_remove">Remover proxy</string>
     <string name="proxy_host_invalid">Digite um nome de host ou IP</string>
     <string name="proxy_port_invalid">Digite uma porta de 1 a 65535</string>
+
+    <!-- Remote Bridge -->
+    <string name="more_remote_bridge_title">Ponte remota</string>
+    <string name="more_remote_bridge_subtitle">Configure downloads remotos do PC-Free</string>
+    <string name="remote_bridge_title">Ponte remota</string>
+    <string name="remote_bridge_intro">Use o PC-Free em uma rede que permita downloads via torrent. URLs remotas devem usar HTTPS.</string>
+    <string name="remote_bridge_url">URL da ponte (HTTPS)</string>
+    <string name="remote_bridge_token">Token Bearer</string>
+    <string name="remote_bridge_save_settings">Salvar configurações</string>
+    <string name="remote_bridge_test_connection">Testar conexão</string>
+    <string name="remote_bridge_clear_settings">Limpar configurações da ponte</string>
+    <string name="remote_bridge_magnet_hint">Link magnet do BitTorrent</string>
+    <string name="remote_bridge_start_download">Iniciar download remoto</string>
+    <string name="remote_bridge_submitting">Enviando…</string>
+    <string name="remote_bridge_job_status">Status da tarefa</string>
+    <string name="remote_bridge_job_id">ID da tarefa: %1$s</string>
+    <string name="remote_bridge_cancel_job">Cancelar tarefa</string>
+    <string name="remote_bridge_forget_job">Esquecer tarefa</string>
+    <string name="remote_bridge_history_cleared">O histórico local foi apagado. A tarefa remota, se estiver ativa, não foi cancelada.</string>
+    <string name="remote_bridge_download_file">Baixar: %1$s</string>
+    <string name="remote_bridge_starting_transfer">Iniciando transferência…</string>
+    <string name="remote_bridge_progress_known">Baixado: %1$d / %2$d MiB</string>
+    <string name="remote_bridge_progress_unknown">Baixado: %1$d MiB</string>
+    <string name="remote_bridge_cancel_file_transfer">Cancelar transferência</string>
+    <string name="remote_bridge_saved_file_uri">URI do arquivo salvo: %1$s</string>
+    <string name="remote_bridge_transfer_complete">Arquivo salvo na pasta pública Downloads/Hazel.</string>
+    <string name="remote_bridge_footer">Os arquivos são salvos na pasta pública Downloads/Hazel. Mantenha a URL da ponte em sigilo e use HTTPS nas conexões remotas.</string>
+    <string name="remote_bridge_initial_status">Configure a ponte e envie um link magnet.</string>
+    <string name="remote_bridge_settings_saved">As configurações da ponte foram salvas com segurança neste dispositivo.</string>
+    <string name="remote_bridge_connection_success">Conectado: %1$s</string>
 </resources>
