@@ -43,9 +43,6 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Language
 import android.content.Intent
 import com.hazel.android.ui.screens.browser.BrowserActivity
-import androidx.compose.material.icons.filled.Language
-import android.content.Intent
-import com.hazel.android.ui.screens.browser.BrowserActivity
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
