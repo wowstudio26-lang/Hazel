@@ -242,7 +242,8 @@ class BrowserActivity : ComponentActivity() {
                                                   setTimeout(function() {
                                                     var s = v.currentSrc || v.src ||
                                                       (v.querySelector('source') && v.querySelector('source').src) || '';
-                                                    if (s && window.LeoBrowserBridge) {
+                                                    if (window.LeoBrowserBridge) {
+                                                      if (!s || s.indexOf('blob:') === 0) s = location.href;
                                                       window.LeoBrowserBridge.onVideoPlaying(s);
                                                     }
                                                   }, 250);
