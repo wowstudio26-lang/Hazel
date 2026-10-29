@@ -5,7 +5,7 @@
          string is what the launcher, the top bar, the splash and the notifications all
          read, so translating it once would rename the app everywhere.
     -->
-    <string name="app_name" translatable="false">Hazel</string>
+    <string name="app_name" translatable="false">Leo Browser</string>
     <!--
          Shown in the system share sheet. Android puts the app name in front of this,
          so naming the app here again would render as "Hazel Hazel direct".
