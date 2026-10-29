@@ -54,8 +54,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.hazel.android.ui.share.ShareOverlayActivity
 
 /**
- * Lightweight in-app browser. When a video element starts playing, its current source is
- * offered to the app's existing share/download sheet, which then resolves real formats.
+ * Lightweight in-app browser. It detects HTML video sources and direct media/manifest
+ * requests (including sources requested by cross-origin player frames) and offers them
+ * to the existing format/download flow. A page URL alone is not treated as a media URL.
  *
  * This does not extract DRM keys or bypass site access controls. Sites that hide media in
  * protected players or do not expose a usable media URL may not provide a downloadable link.
@@ -217,6 +218,31 @@ class BrowserActivity : ComponentActivity() {
                                         request: WebResourceRequest?
                                     ): Boolean = false
 
+                                    // A player may live in a cross-origin iframe, where the
+                                    // injected JavaScript cannot inspect its <video> element.
+                                    // Observe normal WebView requests as a second, generic path
+                                    // for direct media files and HLS/DASH manifests.
+                                    override fun shouldInterceptRequest(
+                                        view: WebView?,
+                                        request: WebResourceRequest?
+                                    ): android.webkit.WebResourceResponse? {
+                                        val candidate = request?.url?.toString().orEmpty()
+                                        val path = runCatching {
+                                            android.net.Uri.parse(candidate).path.orEmpty().lowercase()
+                                        }.getOrDefault("")
+                                        val isMedia = listOf(
+                                            ".m3u8", ".mpd", ".mp4", ".m4v", ".webm", ".mov"
+                                        ).any { path.endsWith(it) }
+                                        if (isMedia && candidate.startsWith("https://", true) ||
+                                            isMedia && candidate.startsWith("http://", true)
+                                        ) {
+                                            runOnUiThread {
+                                                if (mediaUrl != candidate) mediaUrl = candidate
+                                            }
+                                        }
+                                        return super.shouldInterceptRequest(view, request)
+                                    }
+
                                     override fun onPageStarted(
                                         view: WebView?,
                                         url: String?,
@@ -279,12 +305,12 @@ class BrowserActivity : ComponentActivity() {
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    "Video detected",
+                                    "Media source detected",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    "Open the download picker to inspect available video quality and audio tracks.",
+                                    "Open the download picker to check formats and audio tracks. Some streams require site support or session access."
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
                                 )
