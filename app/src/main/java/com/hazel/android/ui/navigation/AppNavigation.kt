@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Language
+import android.content.Intent
+import com.hazel.android.ui.screens.browser.BrowserActivity
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -226,6 +229,19 @@ fun AppNavigation(
                                     fontWeight = FontWeight.SemiBold
                                 )
                             }
+                        }
+
+                        IconButton(
+                            onClick = {
+                                context.startActivity(Intent(context, BrowserActivity::class.java))
+                            },
+                            modifier = Modifier.padding(end = 2.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Language,
+                                contentDescription = "Open Leo Browser",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
 
                         // Reads as on or off at a glance: lit and on a filled ground while
