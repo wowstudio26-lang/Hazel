@@ -268,7 +268,7 @@ class BrowserActivity : ComponentActivity() {
                                                     var s = v.currentSrc || v.src ||
                                                       (v.querySelector('source') && v.querySelector('source').src) || '';
                                                     if (window.LeoBrowserBridge) {
-                                                      if (!s || s.indexOf('blob:') === 0) s = location.href;
+                                                      if (!s || s.indexOf('blob:') === 0) return;
                                                       window.LeoBrowserBridge.onVideoPlaying(s);
                                                     }
                                                   }, 250);
@@ -310,7 +310,7 @@ class BrowserActivity : ComponentActivity() {
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    "Open the download picker to check formats and audio tracks. Some streams require site support or session access."
+                                    "Open the download picker to check formats and audio tracks. Some streams require site support or session access.",
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
                                 )
