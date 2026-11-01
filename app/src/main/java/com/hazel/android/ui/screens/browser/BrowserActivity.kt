@@ -82,9 +82,14 @@ class BrowserActivity : ComponentActivity() {
         /** Where the browser opens when nothing else was asked for. */
         private const val DEFAULT_HOME = "https://duckduckgo.com/"
 
-        private const val DEFAULT_ACCENT = "orange"
+        /**
+         * The palette before preferences have loaded. Matches [AccentColors]' first entry
+         * and Hazel's own brand default, so a browser opening on a fresh install is not a
+         * different colour from the screen that opened it.
+         */
+        private const val DEFAULT_ACCENT = "Cyan"
 
-        /** Must match the download destination's route in the app's nav graph. */
+        /** Matches `Screen.Download.route` in the app's nav graph. */
         private const val ROUTE_DOWNLOAD = "download"
 
         /** Opens the browser on [url], or on its home page when [url] is null. */
