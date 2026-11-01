@@ -6,7 +6,9 @@
  * XMLHttpRequest, and MediaSource, which is what a page uses when it feeds a video element
  * with segments it fetched itself.
  *
- * Part 1 owns the shared helpers on window.__hazel; this half only uses them.
+ * Part 1 owns the shared helpers on window.__hazel; this half only uses them. It also owns
+ * the decision about what counts as media, including the fragments it deliberately skips,
+ * so there is one definition rather than two that can drift.
  */
 (function () {
   if (!window.__hazel || window.__hazelNetwork) return;
