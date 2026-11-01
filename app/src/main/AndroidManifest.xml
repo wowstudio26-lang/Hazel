@@ -63,6 +63,15 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--
+                The long-press menu. Its entries all target this activity and carry their
+                destination in the same extra the app's deep links use, so the browser can
+                stay unexported.
+            -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <!--
@@ -128,9 +137,9 @@
             android:theme="@style/Theme.Hazel" />
 
         <!--
-            The in-app browser. Not exported: it is opened from inside Hazel, and there is no
-            reason for another app to start it. It keeps its own history, so the system's
-            back gesture leaves it the way the user came in.
+            The in-app browser. Not exported, and reached only from inside Hazel: the
+            launcher shortcut above asks MainActivity for it. It keeps its own history, so
+            the system's back gesture leaves it the way the user came in.
         -->
         <activity
             android:name=".ui.screens.browser.BrowserActivity"
