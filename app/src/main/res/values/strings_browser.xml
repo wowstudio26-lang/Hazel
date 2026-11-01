@@ -2,35 +2,27 @@
 <!--
     Strings for the in-app browser.
 
-    English only for now. Hazel ships twenty translated string files and this feature is
-    not in any of them yet; the translations should land before this reaches a release.
+    Every key here is referenced from code or the manifest. Nothing is listed ahead of being
+    wired up: tools/strings/check.py reads values/strings.xml for definitions and scans the
+    whole source tree for uses, so a key with no call site is reported as an orphan and a
+    call site with no key as a dangling reference. Both are failures.
+
+    MUST BE MERGED INTO values/strings.xml BEFORE THIS IS MERGED. The checker reads only
+    values/strings.xml, so while these live in a file of their own they are invisible to it:
+    the Kotlin references below resolve at build time but register as dangling references in
+    CI. Moving them into values/strings.xml is what makes the check pass. English only for
+    now; the twenty existing translations do not cover this feature yet.
 -->
 <resources>
     <string name="browser_title">Browser</string>
     <string name="browser_url_hint">Search or enter address</string>
     <string name="browser_back">Back</string>
-    <string name="browser_forward">Forward</string>
     <string name="browser_reload">Reload</string>
     <string name="browser_stop">Stop</string>
-    <string name="browser_home">Home</string>
     <string name="browser_desktop_mode">Desktop site</string>
-    <string name="browser_open_external">Open in browser</string>
-    <string name="browser_page_progress">Page loading</string>
-
-    <!-- The chip shown over the page when a stream is found. -->
     <string name="browser_download">Download</string>
-    <string name="browser_download_stream">Download this stream</string>
-    <string name="browser_streams_found">%1$d stream(s) found</string>
-    <string name="browser_no_streams">No streams found yet</string>
     <string name="browser_streams_title">Streams on this page</string>
-    <string name="browser_stream_video">Video</string>
-    <string name="browser_stream_audio">Audio</string>
-    <string name="browser_stream_playlist">Playlist</string>
-
-    <string name="browser_link_download">Download with Hazel</string>
-    <string name="browser_link_copy">Copy link</string>
-    <string name="browser_link_open_new">Open in new tab</string>
-
+    <string name="browser_streams_found">%1$d streams found</string>
     <string name="browser_proxy_unavailable">The browser cannot use the proxy you have set, so pages will not open. Change or turn off the proxy in Settings, then try again.</string>
     <string name="browser_error_load">Could not open this page</string>
 </resources>
