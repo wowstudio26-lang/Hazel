@@ -7,7 +7,6 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.hazel.android.HazelApp
 
 /**
  * Page settings and the client that watches requests and injects the sniffer.
@@ -34,14 +33,14 @@ internal fun WebView.configureForBrowser() {
  * The desktop user agent, applied when the user asks for the desktop site.
  *
  * Sites serve their full player to this and a cut-down one otherwise, which is the whole
- * point of the setting.
+ * point of the setting. Passing false restores the engine's own agent.
  */
 internal fun WebView.applyDesktopUserAgent(enabled: Boolean) {
-    val original = settings.userAgentString.orEmpty()
-    val desktop = original.contains("Windows NT") || original.contains("Macintosh")
+    val current = settings.userAgentString.orEmpty()
+    val isDesktop = current.contains("Windows NT") || current.contains("Macintosh")
     when {
-        enabled && !desktop -> settings.userAgentString = DESKTOP_USER_AGENT
-        !enabled && desktop -> settings.userAgentString = null
+        enabled && !isDesktop -> settings.userAgentString = DESKTOP_USER_AGENT
+        !enabled && isDesktop -> settings.userAgentString = null
     }
 }
 
@@ -66,7 +65,10 @@ internal fun browserClient(
         viewModel.onPageFinished(url.orEmpty(), view?.title.orEmpty())
         // Injected after load rather than during: the page's own setup would otherwise race
         // this, and a player built mid-parse would be watched half-built.
-        view?.evaluateJavascript(SnifferScript.script(view.context.applicationContext), null)
+        val appContext = view?.context?.applicationContext
+        if (appContext != null) {
+            view.evaluateJavascript(SnifferScript.script(appContext), null)
+        }
     }
 
     override fun onReceivedError(
@@ -97,6 +99,3 @@ internal fun browserClient(
         )
     }
 }
-
-/** The application context, for the asset read in the injection path. */
-private val WebView.snifferContext get() = HazelApp.instance.applicationContext
