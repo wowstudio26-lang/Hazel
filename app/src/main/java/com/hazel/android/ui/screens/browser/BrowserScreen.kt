@@ -1,15 +1,10 @@
 package com.hazel.android.ui.screens.browser
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
@@ -24,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,12 +33,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hazel.android.R
 import com.hazel.android.download.WebViewProxy
-import com.hazel.android.ui.components.HazelUrlBar
 
 /**
  * The in-app browser.
@@ -54,9 +53,9 @@ import com.hazel.android.ui.components.HazelUrlBar
  * hand its URL over; the queue, the formats, the metadata and the proxy are the download
  * side's business, and it already works.
  *
- * With a proxy set, the page must go through it or not open at all — see [WebViewProxy].
- * A browser showing content from the device's own address while the downloads come from
- * somewhere else would give away the address the proxy exists to hide.
+ * With a proxy set, the page goes through it or does not open at all, because a browser
+ * showing content from the device's own address while the downloads come from somewhere
+ * else would give away the address the proxy exists to hide. See [WebViewProxy].
  */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -75,21 +74,16 @@ fun BrowserScreen(
 
     val sniffer = remember {
         MediaSniffer { detected ->
-            // Called on the bridge thread; the view model posts to the main thread itself.
+            // Called on the bridge thread; the view model hops to the main thread itself.
             viewModel.onMediaDetected(detected) { block -> webView?.post(block) }
         }
     }
 
-    BackHandler(enabled = viewModel.canGoBack) {
-        webView?.goBack()
-    }
+    BackHandler(enabled = viewModel.canGoBack) { webView?.goBack() }
 
     Column(modifier = Modifier.fillMaxSize()) {
         BrowserUrlBar(
             url = viewModel.currentUrl,
-            isLoading = viewModel.isLoading,
-            canGoBack = viewModel.canGoBack,
-            canGoForward = viewModel.canGoForward,
             onClose = onClose,
             onSubmit = { typed -> webView?.loadUrl(SnifferScript.toLoadableUrl(typed)) },
         )
@@ -106,9 +100,7 @@ fun BrowserScreen(
                 Text(
                     text = stringResource(R.string.browser_proxy_unavailable),
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(24.dp),
+                    modifier = Modifier.align(Alignment.Center).padding(24.dp),
                 )
             } else {
                 AndroidView(
@@ -119,10 +111,10 @@ fun BrowserScreen(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                             )
-                            settings.configureForBrowser(viewModel)
+                            configureForBrowser()
                             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
-                            addJavascriptInterface(sniffer, "HazelSniffer")
-                            webViewClient = browserClient(viewModel, sniffer, context.assets)
+                            addJavascriptInterface(sniffer, JS_BRIDGE_NAME)
+                            webViewClient = browserClient(viewModel, sniffer)
                             webChromeClient = object : WebChromeClient() {
                                 override fun onProgressChanged(view: WebView?, newProgress: Int) {
                                     viewModel.onProgressChanged(newProgress)
@@ -149,9 +141,7 @@ fun BrowserScreen(
                         if (viewModel.media.size == 1) onOpenDownloadSheet(viewModel.media.first())
                         else showStreams = true
                     },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp),
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
                 )
             }
         }
@@ -169,32 +159,38 @@ fun BrowserScreen(
     }
 }
 
-/** The bar above the page: address, history, and the way out. */
+/** The name the page sees for the bridge. Must match the name the script calls. */
+const val JS_BRIDGE_NAME = "HazelSniffer"
+
+/** The bar above the page: address, and the way out. */
 @Composable
 private fun BrowserUrlBar(
     url: String,
-    isLoading: Boolean,
-    canGoBack: Boolean,
-    canGoForward: Boolean,
     onClose: () -> Unit,
     onSubmit: (String) -> Unit,
 ) {
     var typed by remember(url) { mutableStateOf(url) }
+    val hint = stringResource(R.string.browser_url_hint)
 
     Surface(tonalElevation = 3.dp) {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp)) {
-            HazelUrlBar(
-                value = typed,
-                onValueChange = { typed = it },
-                hint = stringResource(R.string.browser_url_hint),
-                onSubmit = { onSubmit(typed) },
-                trailing = {
-                    IconButton(onClick = onClose) {
-                        Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.browser_back))
-                    }
-                },
-            )
-        }
+        OutlinedTextField(
+            value = typed,
+            onValueChange = { typed = it },
+            placeholder = { Text(hint, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            singleLine = true,
+            shape = RoundedCornerShape(24.dp),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+            keyboardActions = KeyboardActions(onGo = { onSubmit(typed) }),
+            trailingIcon = {
+                IconButton(onClick = onClose) {
+                    Icon(
+                        Icons.Filled.Close,
+                        contentDescription = stringResource(R.string.browser_back),
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+        )
     }
 }
 
@@ -223,80 +219,3 @@ private fun BrowserDownloadChip(count: Int, onClick: () -> Unit, modifier: Modif
         }
     }
 }
-
-/** Page settings shared by every browser tab. */
-private fun WebSettings.configureForBrowser(viewModel: BrowserViewModel) {
-    javaScriptEnabled = true
-    domStorageEnabled = true
-    databaseEnabled = true
-    loadWithOverviewMode = true
-    useWideViewPort = true
-    mediaPlaybackRequiresUserGesture = false
-    mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-    userAgentString = if (viewModel.desktopMode) {
-        // The desktop UA is what makes sites serve their full player, which is what a user
-        // asking for "desktop site" is after.
-        DESKTOP_USER_AGENT
-    } else {
-        userAgentString
-    }
-}
-
-private const val DESKTOP_USER_AGENT =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " +
-        "Chrome/120.0.0.0 Safari/537.36"
-
-/** The client that watches requests and injection. */
-private fun browserClient(
-    viewModel: BrowserViewModel,
-    sniffer: MediaSniffer,
-    assets: android.content.res.AssetManager,
-): WebViewClient = object : WebViewClient() {
-
-    override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
-        viewModel.onPageStarted(url.orEmpty())
-    }
-
-    override fun onPageFinished(view: WebView?, url: String?) {
-        viewModel.onPageFinished(url.orEmpty(), view?.title.orEmpty())
-        // Injected after load, not during: the asset reads and the string build are cheap,
-        // but running the script mid-parse would race the page's own setup.
-        view?.evaluateJavascript(scriptText(assets), null)
-    }
-
-    override fun onReceivedError(
-        view: WebView?,
-        request: WebResourceRequest?,
-        error: android.webkit.WebResourceError?,
-    ) {
-        // Only the main frame matters; a blocked ad should not blank the screen.
-        if (request?.isForMainFrame == true) {
-            viewModel.onLoadError(error?.description?.toString())
-        }
-    }
-
-    /** The passive net: media the page fetched before any script could see it. */
-    override fun shouldInterceptRequest(
-        view: WebView?,
-        request: WebResourceRequest?,
-    ): WebResourceResponse? {
-        sniffer.offerFromRequest(request?.url?.toString())
-        // Null means "carry on loading normally"; the browser never modifies the response.
-        return null
-    }
-}
-
-@Volatile
-private var cachedScript: String? = null
-
-private fun scriptText(assets: android.content.res.AssetManager): String =
-    cachedScript ?: synchronized(SnifferScript) {
-        cachedScript ?: buildString {
-            append(readAsset(assets, "browser/sniffer-page.js"))
-            append('\n')
-            append(readAsset(assets, "browser/sniffer-network.js"))
-        }.also { cachedScript = it }
-    }
-
-private fun readAsset(assets: android.content.res.AssetManager, name: String): String =
-    runCatching { assets.open(name).bufferedReader().use { it.readText() } }.getOrDefault("")
