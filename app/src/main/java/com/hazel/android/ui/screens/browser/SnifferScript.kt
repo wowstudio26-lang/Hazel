@@ -1,20 +1,19 @@
 package com.hazel.android.ui.screens.browser
 
 import android.content.Context
-import java.net.URLEncoder
 
 /**
  * The browser's two mechanical jobs: handing the page its sniffer script, and deciding what
  * a URL is.
  *
- * The rules live here rather than in the web view so they can be tested on the JVM, with no
- * WebView and no device. That means nothing below the script loader may touch an Android
- * class: the stubs on a unit-test classpath throw on every call, so one `Uri.encode` would
- * take the whole test file with it. [toLoadableUrl] uses the JDK's encoder for that reason.
+ * The rules are here rather than in the web view so they can be tested on the JVM, with no
+ * WebView and no device. Nothing below the script loader may touch an Android class: the
+ * stubs on a unit-test classpath throw on every call, so one Uri.encode would take the whole
+ * test file with it. Query strings go through [QueryEncoding] for that reason, and it is
+ * also where the reason a space is written as %20 rather than a plus is explained.
  *
- * They are also the only place these decisions are made: the chip, the long-press menu and
- * the download hand-off all ask the same questions, so they cannot disagree about whether
- * something is worth downloading.
+ * These are also the only place these decisions are made, so the chip, the long-press menu
+ * and the hand-off cannot disagree about whether something is worth downloading.
  */
 object SnifferScript {
 
@@ -26,10 +25,9 @@ object SnifferScript {
     /**
      * Extensions worth offering.
      *
-     * Deliberately without `ts`, which is two things and neither is wanted: in this project
-     * it is the TypeScript sources, and on an HLS page it is a media *segment*. Segments are
-     * fetched by the hundred and each is a few seconds of video; offering them would bury
-     * the one `.m3u8` the user actually wants under a list of fragments.
+     * No `ts`: in this project that is the TypeScript sources, and on an HLS page it is a
+     * media segment, fetched by the hundred at a few seconds each. Offering those would bury
+     * the one manifest the user actually wants under a list of fragments.
      */
     val DOWNLOADABLE_EXTENSIONS = setOf(
         "m3u8", "mpd", "mp4", "m4v", "mov", "webm", "mkv",
@@ -41,7 +39,7 @@ object SnifferScript {
     @Volatile
     private var cached: String? = null
 
-    /** The whole script, ready to hand to `evaluateJavascript`. */
+    /** The whole script, ready to hand to evaluateJavascript. */
     fun script(context: Context): String = cached ?: synchronized(this) {
         cached ?: load(context).also { cached = it }
     }
@@ -56,8 +54,7 @@ object SnifferScript {
      * Whether a link should be offered as a download rather than followed.
      *
      * Blob and data URLs are turned down: they name a buffer in the page, not a resource
-     * anything else can fetch, so there is nothing to hand to a downloader. The manifest
-     * behind them is reported separately by the script, and that is the URL worth offering.
+     * anything else can fetch, so there is nothing to hand to a downloader.
      */
     fun isDownloadableLink(url: String?): Boolean {
         val target = url.orEmpty()
@@ -71,8 +68,8 @@ object SnifferScript {
 
     /**
      * What kind of stream a URL names. The URL decides first, because a playlist served as
-     * `application/octet-stream` is still a playlist; the MIME only has a say when there is
-     * no extension to read.
+     * application/octet-stream is still a playlist; the MIME only speaks when there is no
+     * extension to read.
      */
     fun classify(url: String, mimeType: String = ""): DetectedMedia.Kind {
         val extension = extensionOf(url)
@@ -84,25 +81,14 @@ object SnifferScript {
         }
     }
 
-    /**
-     * Turns whatever the user typed into something worth loading.
-     *
-     * A bare word is a search, not a host, so it goes to the search engine. Anything that
-     * already looks like an address keeps it. One place decides this, so the URL bar and
-     * the "open external" path cannot disagree.
-     */
+    /** A bare word is a search; anything already shaped like an address is loaded as one. */
     fun toLoadableUrl(input: String, searchTemplate: String = SEARCH_TEMPLATE): String {
         val trimmed = input.trim()
         if (trimmed.isEmpty()) return ""
         if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed
         val looksLikeHost = trimmed.contains('.') && !trimmed.contains(' ')
         if (looksLikeHost) return "https://$trimmed"
-        // The JDK's encoder rather than android.net.Uri: this path is covered by a JVM unit
-        // test, and the Android stubs throw there. A space becomes "+", which is what a
-        // search engine reads as a space in a query anyway.
-        val query = runCatching { URLEncoder.encode(trimmed, Charsets.UTF_8.name()) }
-            .getOrDefault(trimmed)
-        return searchTemplate.replace("%s", query)
+        return searchTemplate.replace("%s", QueryEncoding.encode(trimmed))
     }
 
     /**
@@ -114,8 +100,8 @@ object SnifferScript {
     /**
      * The lowercase extension, or "" when there is none.
      *
-     * The fragment goes before the query, because it is not part of what is fetched: a link
-     * ending `#x.mp4` is a page with an anchor, not a video.
+     * The fragment is dropped before the query, because it is not fetched: a link ending
+     * #x.mp4 is a page with an anchor, not a video.
      */
     private fun extensionOf(url: String): String {
         if (url.isBlank()) return ""
