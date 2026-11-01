@@ -11,8 +11,8 @@ import android.webkit.JavascriptInterface
  * the network does, catching a stream the script never named.
  *
  * Both are de-duplicated by URL, because a single video routinely shows up three or four
- * times: once from the element, once from a `<source>`, once from the network. Offering
- * the same stream four times is how a download list becomes unusable.
+ * times: once from the element, once from a `<source>`, once from the network. Offering the
+ * same stream four times is how a download list becomes unusable.
  *
  * The JS bridge calls [onDetected] on a WebView worker thread, not the main thread.
  * Callers that touch UI state must hop back themselves; nothing here does it for them.
@@ -56,9 +56,14 @@ class MediaSniffer(private val onDetected: (DetectedMedia) -> Unit) {
     private fun record(url: String?, mimeType: String, title: String): Boolean {
         val target = url.orEmpty().trim()
         if (target.isEmpty()) return false
-        // Data and blob URLs name no resource anything else can fetch. The manifest behind
-        // them is reported separately by the script, and that is the URL worth offering.
+        // Checked again here rather than trusted to the caller. The script and the request
+        // net both filter, but a fragment or a page URL arriving some other way should still
+        // not reach the list: this is the one place every path goes through.
         if (target.startsWith("data:") || target.startsWith("blob:")) return false
+        if (isFragment(target)) return false
+        val mimeIsMedia = mimeType.startsWith("video/", ignoreCase = true) ||
+            mimeType.startsWith("audio/", ignoreCase = true)
+        if (!SnifferScript.isMediaUrl(target) && !mimeIsMedia) return false
 
         synchronized(seen) {
             if (!seen.add(target)) return false
@@ -72,5 +77,18 @@ class MediaSniffer(private val onDetected: (DetectedMedia) -> Unit) {
             ),
         )
         return true
+    }
+
+    /**
+     * Whether a URL is a fragment of a stream rather than a stream.
+     *
+     * HLS splits a video into `.ts` pieces and DASH into `.m4s`, and a player fetches them
+     * by the hundred. Each is a few seconds long; the thing worth downloading is the
+     * manifest that lists them, which is reported separately.
+     */
+    private fun isFragment(url: String): Boolean {
+        val path = url.substringBefore('?').substringBefore('#')
+        val extension = path.substringAfterLast('.', "").lowercase()
+        return extension == "ts" || extension == "m4s"
     }
 }
