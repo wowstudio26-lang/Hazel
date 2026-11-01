@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Launcher shortcuts, shown on a long press of the app icon.
+
+    Every one of them targets MainActivity, which is already exported for the launcher, and
+    carries the destination in the same `hazel.navigate.to` extra the app's own deep links
+    use. The browser is listed here because it is the one part of Hazel that is a
+    destination in its own right: a user who wants to browse and grab a stream should not
+    have to open a downloader first.
+
+    Deliberately not targeting the browser activity directly. A shortcut is launched by the
+    launcher, so its target has to be exported, and that would leave the browser openable by
+    any app on the device for the sake of a convenience menu. MainActivity hands the request
+    on internally instead, and the browser stays private.
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="browser"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/browser_title"
+        android:shortcutLongLabel="@string/browser_title">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.hazel.android"
+            android:targetClass="com.hazel.android.MainActivity">
+            <extra
+                android:name="hazel.navigate.to"
+                android:value="browser" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="downloads"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/nav_home">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.hazel.android"
+            android:targetClass="com.hazel.android.MainActivity" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="queue"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/nav_queue">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.hazel.android"
+            android:targetClass="com.hazel.android.MainActivity">
+            <extra
+                android:name="hazel.navigate.to"
+                android:value="queue" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="history"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/nav_history">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.hazel.android"
+            android:targetClass="com.hazel.android.MainActivity">
+            <extra
+                android:name="hazel.navigate.to"
+                android:value="history" />
+        </intent>
+    </shortcut>
+
+</shortcuts>
