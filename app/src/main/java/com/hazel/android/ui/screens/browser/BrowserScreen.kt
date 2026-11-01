@@ -6,8 +6,11 @@ import android.webkit.CookieManager
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,7 +19,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DesktopWindows
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -25,12 +30,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -79,12 +86,28 @@ fun BrowserScreen(
         }
     }
 
+    // The desktop agent is applied to the live web view and then the page is reloaded,
+    // because a site decides what to serve from the user agent at request time. Setting it
+    // without a reload would leave the page the user is looking at unchanged.
+    LaunchedEffect(viewModel.desktopMode) {
+        val view = webView ?: return@LaunchedEffect
+        view.applyDesktopUserAgent(viewModel.desktopMode)
+        view.reload()
+    }
+
     BackHandler(enabled = viewModel.canGoBack) { webView?.goBack() }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        BrowserUrlBar(
+        BrowserTopBar(
             url = viewModel.currentUrl,
+            desktopMode = viewModel.desktopMode,
+            isLoading = viewModel.isLoading,
             onClose = onClose,
+            onToggleDesktop = { viewModel.setDesktopMode(!viewModel.desktopMode) },
+            onReloadOrStop = {
+                val view = webView ?: return@BrowserTopBar
+                if (viewModel.isLoading) view.stopLoading() else view.reload()
+            },
             onSubmit = { typed -> webView?.loadUrl(SnifferScript.toLoadableUrl(typed)) },
         )
 
@@ -96,12 +119,11 @@ fun BrowserScreen(
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
+            val failure = viewModel.loadError
             if (proxyBlocked) {
-                Text(
-                    text = stringResource(R.string.browser_proxy_unavailable),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.align(Alignment.Center).padding(24.dp),
-                )
+                CentredNotice(stringResource(R.string.browser_proxy_unavailable))
+            } else if (failure != null) {
+                CentredNotice(stringResource(R.string.browser_error_load))
             } else {
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
@@ -132,7 +154,7 @@ fun BrowserScreen(
             }
 
             // The chip. Only over a page, and only when there is something to offer.
-            if (viewModel.media.isNotEmpty()) {
+            if (viewModel.media.isNotEmpty() && !proxyBlocked) {
                 BrowserDownloadChip(
                     count = viewModel.media.size,
                     onClick = {
@@ -159,38 +181,79 @@ fun BrowserScreen(
     }
 }
 
-/** The name the page sees for the bridge. Must match the name the script calls. */
-const val JS_BRIDGE_NAME = "HazelSniffer"
-
-/** The bar above the page: address, and the way out. */
 @Composable
-private fun BrowserUrlBar(
+private fun CentredNotice(message: String) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(24.dp),
+        )
+    }
+}
+
+/** The bar above the page: address, the desktop toggle, reload, and the way out. */
+@Composable
+private fun BrowserTopBar(
     url: String,
+    desktopMode: Boolean,
+    isLoading: Boolean,
     onClose: () -> Unit,
+    onToggleDesktop: () -> Unit,
+    onReloadOrStop: () -> Unit,
     onSubmit: (String) -> Unit,
 ) {
+    // Keyed on url so the field follows the page: navigating to a link the user tapped
+    // should show where they are, but typing into it should not be overwritten mid-edit.
     var typed by remember(url) { mutableStateOf(url) }
     val hint = stringResource(R.string.browser_url_hint)
 
     Surface(tonalElevation = 3.dp) {
-        OutlinedTextField(
-            value = typed,
-            onValueChange = { typed = it },
-            placeholder = { Text(hint, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-            singleLine = true,
-            shape = RoundedCornerShape(24.dp),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
-            keyboardActions = KeyboardActions(onGo = { onSubmit(typed) }),
-            trailingIcon = {
-                IconButton(onClick = onClose) {
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp)) {
+            OutlinedTextField(
+                value = typed,
+                onValueChange = { typed = it },
+                placeholder = { Text(hint, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                singleLine = true,
+                shape = RoundedCornerShape(24.dp),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+                keyboardActions = KeyboardActions(onGo = { onSubmit(typed) }),
+                trailingIcon = {
+                    IconButton(onClick = onClose) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = stringResource(R.string.browser_back),
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                // Tinted while on, so a setting that changes what every site serves is
+                // visible from the page it is changing.
+                IconButton(onClick = onToggleDesktop) {
                     Icon(
-                        Icons.Filled.Close,
-                        contentDescription = stringResource(R.string.browser_back),
+                        Icons.Filled.DesktopWindows,
+                        contentDescription = stringResource(R.string.browser_desktop_mode),
+                        tint = if (desktopMode) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-            },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
-        )
+                IconButton(onClick = onReloadOrStop) {
+                    Icon(
+                        Icons.Filled.Refresh,
+                        contentDescription = stringResource(
+                            if (isLoading) R.string.browser_stop else R.string.browser_reload,
+                        ),
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -198,10 +261,11 @@ private fun BrowserUrlBar(
 @Composable
 private fun BrowserDownloadChip(count: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
-        onClick = onClick,
+        // A plain Surface with a click modifier rather than Surface(onClick = ...), which is
+        // still experimental in this Material 3 version. Same look, no opt-in.
         shape = RoundedCornerShape(28.dp),
         color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = modifier,
+        modifier = modifier.clip(RoundedCornerShape(28.dp)).clickable(onClick = onClick),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
