@@ -2,13 +2,16 @@
 <!--
     Launcher shortcuts, shown on a long press of the app icon.
 
-    The browser is listed here rather than only inside the app because it is the one thing
-    in Hazel that is a destination in its own right: a user who wants to browse and grab a
-    stream should not have to open a downloader first. The other three go straight to the
-    tabs a user is most likely to want, and are routed through MainActivity so they land on
-    the real bottom-bar destination rather than on a stack of their own.
+    Every one of them targets MainActivity, which is already exported for the launcher, and
+    carries the destination in the same `hazel.navigate.to` extra the app's own deep links
+    use. The browser is listed here because it is the one part of Hazel that is a
+    destination in its own right: a user who wants to browse and grab a stream should not
+    have to open a downloader first.
 
-    The browser target is a separate activity, so it opens directly.
+    Deliberately not targeting the browser activity directly. A shortcut is launched by the
+    launcher, so its target has to be exported, and that would leave the browser openable by
+    any app on the device for the sake of a convenience menu. MainActivity hands the request
+    on internally instead, and the browser stays private.
 -->
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -21,7 +24,11 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.hazel.android"
-            android:targetClass="com.hazel.android.ui.screens.browser.BrowserActivity" />
+            android:targetClass="com.hazel.android.MainActivity">
+            <extra
+                android:name="hazel.navigate.to"
+                android:value="browser" />
+        </intent>
     </shortcut>
 
     <shortcut
