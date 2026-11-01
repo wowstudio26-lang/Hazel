@@ -24,6 +24,7 @@ import com.hazel.android.data.SettingsRepository
 import com.hazel.android.download.DownloadNotificationHelper
 import com.hazel.android.ui.navigation.AppNavigation
 import com.hazel.android.ui.screens.SplashScreen
+import com.hazel.android.ui.screens.browser.BrowserActivity
 import com.hazel.android.ui.theme.HazelTheme
 import com.hazel.android.util.AppLocale
 import com.hazel.android.util.PermissionHelper
@@ -58,6 +59,12 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_NAVIGATE_TO = "hazel.navigate.to"
+
+        /**
+         * The browser's route. Not a destination in the nav graph: it is a separate
+         * activity, so it is intercepted rather than navigated to.
+         */
+        const val ROUTE_BROWSER = "browser"
     }
 
     /**
@@ -172,9 +179,15 @@ class MainActivity : ComponentActivity() {
             ?.takeIf { it.isNotBlank() }
             ?.let { pendingFailure = it }
 
-        intent?.getStringExtra(EXTRA_NAVIGATE_TO)
-            ?.takeIf { it.isNotBlank() }
-            ?.let { pendingRoute = it }
+        // The browser is a separate activity, so a request for it is answered here rather
+        // than handed to the nav graph, which has no such destination. Nothing is left in
+        // pendingRoute for it: by the time the composition runs, it is already on screen.
+        val route = intent?.getStringExtra(EXTRA_NAVIGATE_TO)?.takeIf { it.isNotBlank() }
+        if (route == ROUTE_BROWSER) {
+            startActivity(BrowserActivity.intent(this))
+        } else {
+            route?.let { pendingRoute = it }
+        }
     }
 
     /**
