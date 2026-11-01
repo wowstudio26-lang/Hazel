@@ -4,12 +4,13 @@ import android.content.Context
 import android.net.Uri
 
 /**
- * Reads the two sniffer scripts out of the app's assets.
+ * The browser's two mechanical jobs: handing the page its sniffer script, and deciding
+ * what a URL is.
  *
- * Kept as assets rather than Kotlin string literals for two reasons: the scripts stay
- * readable and lintable as JavaScript, and no escaping in a Kotlin string can quietly
- * corrupt a regex. [script] joins them in order and caches the result, because it is asked
- * for on every page load and the files never change while the app runs.
+ * The rules live here rather than in the web view so they can be tested on the JVM, with no
+ * WebView and no device. They are also the only place these decisions are made: the chip,
+ * the long-press menu and the download hand-off all ask the same questions, so they cannot
+ * disagree about whether something is worth downloading.
  */
 object SnifferScript {
 
@@ -17,6 +18,17 @@ object SnifferScript {
 
     /** Injected in this order: elements first, then the script hooks that use its helpers. */
     private val FILES = listOf("sniffer-page.js", "sniffer-network.js")
+
+    /**
+     * Extensions worth offering. Deliberately not `ts`: in this project that means the
+     * TypeScript sources, and an HLS segment is never something the user wants by name.
+     */
+    val DOWNLOADABLE_EXTENSIONS = setOf(
+        "m3u8", "mpd", "mp4", "m4v", "mov", "webm", "mkv",
+        "m4a", "mp3", "aac", "flac", "ogg", "opus", "wav",
+    )
+
+    private val AUDIO_EXTENSIONS = setOf("m4a", "mp3", "aac", "flac", "ogg", "opus", "wav")
 
     @Volatile
     private var cached: String? = null
@@ -34,28 +46,33 @@ object SnifferScript {
 
     /**
      * Whether a tapped or long-pressed link should be offered as a download rather than
-     * followed. Media files are the case worth interrupting for; a page URL is not.
+     * followed. A page URL is not; a media file is.
      */
-    fun isDownloadableLink(url: String?): Boolean {
-        val target = url.orEmpty()
-        if (target.isBlank()) return false
-        if (target.startsWith("blob:") || target.startsWith("data:")) return false
-        val noQuery = target.substringBefore('?').substringBefore('#')
-        val extension = noQuery.substringAfterLast('.', "")
-        return extension.lowercase() in DOWNLOADABLE_EXTENSIONS
-    }
+    fun isDownloadableLink(url: String?): Boolean = extensionOf(url?.takeIf {
+        !it.startsWith("blob:") && !it.startsWith("data:")
+    }) in DOWNLOADABLE_EXTENSIONS
 
-    val DOWNLOADABLE_EXTENSIONS = setOf(
-        "m3u8", "mpd", "mp4", "m4v", "mov", "webm", "mkv", "ts",
-        "m4a", "mp3", "aac", "flac", "ogg", "opus", "wav",
-    )
+    /** Whether a stream seen in a network response is worth recording. */
+    fun isMediaUrl(url: String?): Boolean = isDownloadableLink(url)
+
+    /**
+     * What kind of stream a URL names. The URL decides first, because a playlist served as
+     * `application/octet-stream` is still a playlist; the MIME only has a say when there is
+     * no extension to read.
+     */
+    fun classify(url: String, mimeType: String = ""): DetectedMedia.Kind = when {
+        extensionOf(url) == "m3u8" || extensionOf(url) == "mpd" -> DetectedMedia.Kind.PLAYLIST
+        extensionOf(url) in AUDIO_EXTENSIONS -> DetectedMedia.Kind.AUDIO
+        mimeType.startsWith("audio/", ignoreCase = true) -> DetectedMedia.Kind.AUDIO
+        else -> DetectedMedia.Kind.VIDEO
+    }
 
     /**
      * Turns whatever the user typed into something worth loading.
      *
      * A bare word is a search, not a host, so it goes to the search engine. Anything that
-     * already looks like an address keeps it. This is the one place that decision is made,
-     * so the URL bar and the "open external" path cannot disagree.
+     * already looks like an address keeps it. One place decides this, so the URL bar and
+     * the "open external" path cannot disagree.
      */
     fun toLoadableUrl(input: String, searchTemplate: String = "https://duckduckgo.com/?q=%s"): String {
         val trimmed = input.trim()
@@ -64,5 +81,18 @@ object SnifferScript {
         val looksLikeHost = trimmed.contains('.') && !trimmed.contains(' ')
         if (looksLikeHost) return "https://$trimmed"
         return searchTemplate.replace("%s", Uri.encode(trimmed))
+    }
+
+    /**
+     * The lowercase extension, or "" when there is none.
+     *
+     * The fragment is dropped before the query, because it is not part of what is fetched:
+     * a link ending `#x.mp4` is a page with an anchor, not a video.
+     */
+    private fun extensionOf(url: String?): String {
+        val target = url.orEmpty()
+        if (target.isBlank()) return ""
+        val path = target.substringBefore('?').substringBefore('#')
+        return path.substringAfterLast('.', "").lowercase()
     }
 }
