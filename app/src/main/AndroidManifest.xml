@@ -127,6 +127,18 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
             android:theme="@style/Theme.Hazel" />
 
+        <!--
+            The in-app browser. Not exported: it is opened from inside Hazel, and there is no
+            reason for another app to start it. It keeps its own history, so the system's
+            back gesture leaves it the way the user came in.
+        -->
+        <activity
+            android:name=".ui.screens.browser.BrowserActivity"
+            android:exported="false"
+            android:label="@string/browser_title"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:theme="@style/Theme.Hazel" />
+
         <!-- FileProvider for opening downloaded files -->
         <provider
             android:name="androidx.core.content.FileProvider"
